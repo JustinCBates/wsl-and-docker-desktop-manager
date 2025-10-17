@@ -1,3 +1,5 @@
+# Parameters for uninstallation orchestration
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [Parameter(Mandatory=$true)]
     [ValidateSet("wsl-only", "docker-only", "both")]

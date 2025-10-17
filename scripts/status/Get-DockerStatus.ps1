@@ -86,7 +86,7 @@ function Get-DockerVersion {
         }
     }
     catch {
-        # Continue to return not available
+        Write-Verbose "Docker not available: $($_.Exception.Message)"
     }
     
     return @{

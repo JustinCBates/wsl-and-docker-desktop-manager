@@ -1,3 +1,5 @@
+# Parameters available for command-line invocation (used by MVP and other callers)
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [Parameter(Position=0)]
     [ValidateSet("backup", "install-wsl", "install-docker", "install-both", "uninstall-wsl", "uninstall-docker", "uninstall-both", "restore", "complete-reinstall")]

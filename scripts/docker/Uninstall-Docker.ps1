@@ -1,3 +1,5 @@
+# Parameters for Docker uninstallation
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [string]$BackupPath = "C:\DockerBackup",
     [switch]$Force = $false

@@ -7,8 +7,8 @@ try {
     
     if ($errors) {
         Write-Host "PowerShell syntax errors found:" -ForegroundColor Red
-        foreach ($error in $errors) {
-            Write-Host "Line $($error.Token.StartLine): $($error.Message)" -ForegroundColor Red
+        foreach ($syntaxError in $errors) {
+            Write-Host "Line $($syntaxError.Token.StartLine): $($syntaxError.Message)" -ForegroundColor Red
         }
         exit 1
     } else {
