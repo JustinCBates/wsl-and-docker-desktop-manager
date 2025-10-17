@@ -4,7 +4,7 @@
 
 param(
     [string]$DockerDataPath = "C:\ProgramData\Docker",
-    [switch]$UseStableChannel = $true,
+    [bool]$UseStableChannel = $true,
     [switch]$EnableKubernetes = $false
 )
 

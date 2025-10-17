@@ -28,7 +28,7 @@ try {
 function Invoke-DockerCommand {
     param([string]$Command)
     try {
-        Invoke-Expression $Command
+        & ([ScriptBlock]::Create($Command))
         return $true
     } catch {
         Write-Host "⚠️  Command failed: $Command" -ForegroundColor Yellow
