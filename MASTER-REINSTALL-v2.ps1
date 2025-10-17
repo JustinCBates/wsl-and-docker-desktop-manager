@@ -22,16 +22,16 @@ $ErrorActionPreference = "Stop"
 
 function Write-Header {
     param([string]$Title)
-    Write-Host "`n" -NoNewline
-    Write-Host "=" * 60 -ForegroundColor Cyan
-    Write-Host "  $Title" -ForegroundColor Green
-    Write-Host "=" * 60 -ForegroundColor Cyan
-    Write-Host ""
+    Write-Output "`n" -NoNewline
+    Write-Information (("=" * 60)) -Tags Info
+    Write-Information ("  $Title") -Tags Title
+    Write-Information (("=" * 60)) -Tags Info
+    Write-Output ""
 }
 
 function Write-Phase {
     param([string]$Message)
-    Write-Host "`nðŸ“‹ $Message" -ForegroundColor Yellow
+    Write-Information "`nðŸ“‹ $Message" -Tags Phase
 }
 
 function Test-AdminRights {
@@ -64,11 +64,11 @@ function Invoke-ScriptPhase {
         
         $result = & $scriptPath @Arguments
         
-        Write-Host "âœ… $PhaseName completed successfully" -ForegroundColor Green
+        Write-Information "âœ… $PhaseName completed successfully" -Tags Success
         return $result
     }
     catch {
-        Write-Host "âŒ $PhaseName failed: $_" -ForegroundColor Red
+        Write-Error "âŒ $PhaseName failed: $_"
         throw
     }
 }
@@ -77,25 +77,25 @@ function Show-SystemStatus {
     $systemState = Get-SystemState
     
     Write-Header "Current System Status"
-    Write-Host "WSL Status:    " -NoNewline
+    Write-Output "WSL Status:    " -NoNewline
     if ($systemState.WSLInstalled) {
-        Write-Host "âœ… Installed" -ForegroundColor Green
+        Write-Information "âœ… Installed" -Tags Status
     } else {
-        Write-Host "âŒ Not Installed" -ForegroundColor Red
+        Write-Error "âŒ Not Installed"
     }
     
-    Write-Host "Docker Status: " -NoNewline
+    Write-Output "Docker Status: " -NoNewline
     if ($systemState.DockerInstalled) {
-        Write-Host "âœ… Installed" -ForegroundColor Green
+        Write-Information "âœ… Installed" -Tags Status
     } else {
-        Write-Host "âŒ Not Installed" -ForegroundColor Red
+        Write-Error "âŒ Not Installed"
     }
     
-    Write-Host "Backup Status: " -NoNewline
+    Write-Output "Backup Status: " -NoNewline
     if ($systemState.BackupExists) {
-        Write-Host "âœ… Available at $BackupPath" -ForegroundColor Green
+        Write-Information "âœ… Available at $BackupPath" -Tags Status
     } else {
-        Write-Host "âŒ No backup found" -ForegroundColor Red
+        Write-Warning "âŒ No backup found"
     }
     
     return $systemState
@@ -194,7 +194,7 @@ try {
             if ($Force) { $uninstallArgs += "-Force" }
             $result = Invoke-ScriptPhase -ScriptName "Uninstall-Orchestrator.ps1" -PhaseName "Complete Uninstallation" -Arguments $uninstallArgs
             if ($result -eq "restart") { 
-                Write-Host "`nâš ï¸  System restart required. Please restart and run install phase manually." -ForegroundColor Yellow
+                Write-Warning "`nâš ï¸  System restart required. Please restart and run install phase manually."
                 exit 0 
             }
             
@@ -213,33 +213,33 @@ try {
         }
         
         default {
-            Write-Host "âŒ Invalid or missing phase parameter" -ForegroundColor Red
-            Write-Host "`nUsage: .\MASTER-REINSTALL-v2.ps1 [phase] [options]" -ForegroundColor Yellow
-            Write-Host "`nAvailable phases:" -ForegroundColor Yellow
-            Write-Host "  backup              - Backup Docker data only"
-            Write-Host "  install-wsl         - Install WSL only"
-            Write-Host "  install-docker      - Install Docker only"
-            Write-Host "  install-both        - Install WSL and Docker"
-            Write-Host "  uninstall-wsl       - Uninstall WSL only"
-            Write-Host "  uninstall-docker    - Uninstall Docker only"
-            Write-Host "  uninstall-both      - Uninstall WSL and Docker"
-            Write-Host "  restore             - Restore Docker data from backup"
-            Write-Host "  complete-reinstall  - Full backup, uninstall, and reinstall"
-            Write-Host "`nOptions:"
-            Write-Host "  -BackupPath [path]  - Custom backup location (default: C:\DockerBackup)"
-            Write-Host "  -SkipBackup         - Skip backup operations"
-            Write-Host "  -Force              - Force operations without prompts"
-            Write-Host "  -AutoConfirm        - Automatically confirm all prompts"
+            Write-Error "âŒ Invalid or missing phase parameter"
+            Write-Output "`nUsage: .\MASTER-REINSTALL-v2.ps1 [phase] [options]"
+            Write-Output "`nAvailable phases:"
+            Write-Output "  backup              - Backup Docker data only"
+            Write-Output "  install-wsl         - Install WSL only"
+            Write-Output "  install-docker      - Install Docker only"
+            Write-Output "  install-both        - Install WSL and Docker"
+            Write-Output "  uninstall-wsl       - Uninstall WSL only"
+            Write-Output "  uninstall-docker    - Uninstall Docker only"
+            Write-Output "  uninstall-both      - Uninstall WSL and Docker"
+            Write-Output "  restore             - Restore Docker data from backup"
+            Write-Output "  complete-reinstall  - Full backup, uninstall, and reinstall"
+            Write-Output "`nOptions:"
+            Write-Output "  -BackupPath [path]  - Custom backup location (default: C:\DockerBackup)"
+            Write-Output "  -SkipBackup         - Skip backup operations"
+            Write-Output "  -Force              - Force operations without prompts"
+            Write-Output "  -AutoConfirm        - Automatically confirm all prompts"
             exit 1
         }
     }
     
     Write-Header "Operation Completed Successfully"
-    Write-Host "ðŸŽ‰ All operations completed successfully!" -ForegroundColor Green
+    Write-Information "ðŸŽ‰ All operations completed successfully!" -Tags Success
     
     exit 0
 }
 catch {
-    Write-Host "`nâŒ Operation failed: $_" -ForegroundColor Red
+    Write-Error "`nâŒ Operation failed: $_"
     exit 1
 }
