@@ -1,4 +1,4 @@
-# Add UTF-8 BOM to PowerShell files
+﻿# Add UTF-8 BOM to PowerShell files
 # This fixes PSUseBOMForUnicodeEncodedFile warnings
 
 $files = @(
@@ -32,16 +32,16 @@ foreach ($file in $files) {
         try {
             $content = Get-Content -Path $fullPath -Raw
             [System.IO.File]::WriteAllText($fullPath, $content, $utf8WithBom)
-            Write-Host "✅ Added BOM to: $file" -ForegroundColor Green
+            Write-Host "âœ… Added BOM to: $file" -ForegroundColor Green
             $successCount++
         }
         catch {
-            Write-Host "❌ Failed to process: $file - $_" -ForegroundColor Red
+            Write-Host "âŒ Failed to process: $file - $_" -ForegroundColor Red
             $errorCount++
         }
     }
     else {
-        Write-Host "⚠️  File not found: $file" -ForegroundColor Yellow
+        Write-Host "âš ï¸  File not found: $file" -ForegroundColor Yellow
         $errorCount++
     }
 }
