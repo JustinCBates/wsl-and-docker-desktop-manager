@@ -27,29 +27,35 @@ if (-not $Force) {
 
 # Function to stop services safely
 function Stop-ServiceSafely {
+    [CmdletBinding(SupportsShouldProcess)]
     param([string]$ServiceName)
     try {
         $service = Get-Service -Name $ServiceName -ErrorAction SilentlyContinue
         if ($service -and $service.Status -eq "Running") {
-            Write-Host "  ðŸ›‘ Stopping service: $ServiceName..." -ForegroundColor White
-            Stop-Service -Name $ServiceName -Force
-            Write-Host "  âœ… Service $ServiceName stopped" -ForegroundColor Green
+            Write-Host "  ðŸ›' Stopping service: $ServiceName..." -ForegroundColor White
+            if ($PSCmdlet.ShouldProcess($ServiceName, "Stop service")) {
+                Stop-Service -Name $ServiceName -Force
+                Write-Host "  âœ… Service $ServiceName stopped" -ForegroundColor Green
+            }
         }
     } catch {
-        Write-Host "  âš ï¸  Could not stop service $ServiceName`: $_" -ForegroundColor Yellow
+        Write-Host "  âš ï¸  Could not stop service $ServiceName`: $_" -ForegroundColor Yellow
     }
 }
 
 # Function to remove directory safely
 function Remove-DirectorySafely {
+    [CmdletBinding(SupportsShouldProcess)]
     param([string]$Path, [string]$Description)
     if (Test-Path $Path) {
         try {
-            Write-Host "  ðŸ—‘ï¸  Removing $Description..." -ForegroundColor White
-            Remove-Item -Path $Path -Recurse -Force
-            Write-Host "  âœ… $Description removed" -ForegroundColor Green
+            Write-Host "  ðŸ—'ï¸  Removing $Description..." -ForegroundColor White
+            if ($PSCmdlet.ShouldProcess($Path, "Remove directory $Description")) {
+                Remove-Item -Path $Path -Recurse -Force
+                Write-Host "  âœ… $Description removed" -ForegroundColor Green
+            }
         } catch {
-            Write-Host "  âš ï¸  Could not remove $Description`: $_" -ForegroundColor Yellow
+            Write-Host "  âš ï¸  Could not remove $Description`: $_" -ForegroundColor Yellow
         }
     }
 }
