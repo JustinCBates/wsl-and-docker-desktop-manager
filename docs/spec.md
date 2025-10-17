@@ -191,6 +191,10 @@ These are repository-level constraints and rules to guide development for the MV
 
 Additions that deviate from these placement rules require your sign-off.
 
+## Development guide rails
+
+See `docs/AI_Guiderails.md` for the full development guide rails and placement rules.
+
 ## Design mode — current decisions and confirmed `src/` layout
 
 This section captures the current, agreed-upon design decisions made during the design phase. It documents the confirmed `src/` directory layout, the order of work (what will be wired first), and the hard constraints the team agreed to during design mode.
