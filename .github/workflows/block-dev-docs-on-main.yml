@@ -1,0 +1,27 @@
+name: Block development docs from main
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main ]
+
+jobs:
+  block_dev_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for development docs changes
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: List changed files
+        run: |
+          echo "Changed files:" 
+          git --no-pager diff --name-only origin/${{ github.event.pull_request.base.ref }}...${{ github.sha }}
+      - name: Fail if docs/development changed
+        run: |
+          CHANGED=$(git --no-pager diff --name-only origin/${{ github.event.pull_request.base.ref }}...${{ github.sha }} | grep -E '^docs/development/' || true)
+          if [ -n "$CHANGED" ]; then
+            echo "Development-only docs were modified in this PR:"; echo "$CHANGED";
+            echo "If this change must go to main, move files to docs/production/ or contact repo admins.";
+            exit 1
+          fi
