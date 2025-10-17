@@ -11,5 +11,4 @@ function Uninstall-Orchestrator {
 	return "MOCK: Uninstall-Orchestrator would sequence uninstall steps: stop Docker, uninstall Docker Desktop, unregister WSL distributions (requires -Yes). This is a no-op mock."
 }
 
-Export-ModuleMember -Function Uninstall-Orchestrator
 

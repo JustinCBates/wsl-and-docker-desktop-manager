@@ -1,0 +1,6 @@
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+exclude = ["src/.venv", "src/__pycache__", "src/.venv/**"]
+
+# Add/adjust rules as needed; this file is intentionally lightweight and located under src/ per guide rails.
