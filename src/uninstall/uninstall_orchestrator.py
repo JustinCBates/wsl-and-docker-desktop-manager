@@ -39,14 +39,14 @@ def uninstall_sequence(yes: bool = False, dry_run: bool = True):
         results.append(runner.invoke("uninstall_docker", uninstall_docker, yes_required=True, yes=yes))
     else:
         # call elevated PowerShell uninstall script (mock placeholder)
-        script = os.path.join(repo_root, 'tools', 'acl', 'uninstall_docker.ps1')
+    script = os.path.join(repo_root, 'tools', 'protect', 'uninstall_docker.ps1')
         results.append(runner.invoke("uninstall_docker", lambda: _run_elevated_script(script), yes_required=True, yes=yes))
 
     # unregister_wsl: requires explicit yes
     if dry_run:
         results.append(runner.invoke("unregister_wsl", unregister_wsl, yes_required=True, yes=yes))
     else:
-        script = os.path.join(repo_root, 'tools', 'acl', 'unregister_wsl.ps1')
+    script = os.path.join(repo_root, 'tools', 'protect', 'unregister_wsl.ps1')
         results.append(runner.invoke("unregister_wsl", lambda: _run_elevated_script(script), yes_required=True, yes=yes))
 
     return results
