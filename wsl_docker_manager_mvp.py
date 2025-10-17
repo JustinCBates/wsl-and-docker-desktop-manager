@@ -76,11 +76,44 @@ class WSLDockerManager:
             return False
 
     def show_system_status(self):
-        """Display current WSL and Docker Desktop status."""
+        """Display current WSL and Docker Desktop status using the comprehensive status script."""
         print("🔍 System Status Check")
         print("-" * 50)
 
-        # Check WSL status
+        try:
+            # Use the comprehensive system status script
+            script_path = self.script_dir / "scripts" / "status" / "Get-SystemStatus.ps1"
+            
+            if not script_path.exists():
+                print(f"❌ Status script not found: {script_path}")
+                return
+
+            result = subprocess.run([
+                'powershell.exe',
+                '-ExecutionPolicy', 'Bypass',
+                '-File', str(script_path),
+                '-ShowDetails'
+            ], capture_output=True, text=True, check=False)
+
+            if result.returncode == 0:
+                print(result.stdout)
+                print("✅ Status check completed successfully!")
+            else:
+                print("⚠️ Status check completed with warnings:")
+                print(result.stdout)
+                if result.stderr:
+                    print("Errors:")
+                    print(result.stderr)
+
+        except (OSError, subprocess.SubprocessError) as exc:
+            print(f"❌ Error running status check: {exc}")
+            
+            # Fallback to basic status check
+            print("\nFalling back to basic status check...")
+            self._basic_status_check()
+
+    def _basic_status_check(self):
+        """Basic fallback status check."""
         print("WSL Status:")
         try:
             result = subprocess.run(['wsl', '--list', '--verbose'],

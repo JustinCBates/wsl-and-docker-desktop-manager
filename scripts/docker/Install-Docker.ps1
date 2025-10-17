@@ -10,22 +10,11 @@ function Write-Phase {
     Write-Output "`n📋 Docker Install: $Message"
 }
 
+# Import Docker status functions
+. "$PSScriptRoot\..\status\Get-DockerStatus.ps1"
+
 function Test-AdminRights {
     return ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-}
-
-function Test-DockerInstalled {
-    try {
-        $dockerPath = Get-Command docker.exe -ErrorAction SilentlyContinue
-        if ($dockerPath) {
-            & docker --version 2>$null | Out-Null
-            return $LASTEXITCODE -eq 0
-        }
-        return $false
-    }
-    catch {
-        return $false
-    }
 }
 
 function Install-DockerDesktop {
@@ -115,20 +104,20 @@ function Start-DockerDesktop {
     }
 }
 
-function Test-DockerWorking {
+function Test-DockerWorkingWithOutput {
     Write-Phase "Testing Docker installation"
     
     try {
         Write-Output "Running Docker test..."
-        & docker run --rm hello-world 2>$null | Out-Null
+        $result = Test-DockerWorking
         
-        if ($LASTEXITCODE -eq 0) {
+        if ($result) {
             Write-Output "✅ Docker is working correctly"
-            return $true
         } else {
             Write-Warning "Docker test failed"
-            return $false
         }
+        
+        return $result
     }
     catch {
         Write-Warning "Docker test failed: $_"
@@ -147,7 +136,7 @@ try {
     # Check if Docker is already installed and working
     if ((Test-DockerInstalled) -and -not $Force) {
         Write-Output "Docker is already installed. Testing functionality..."
-        if (Test-DockerWorking) {
+        if (Test-DockerWorkingWithOutput) {
             Write-Output "✅ Docker is already installed and working"
             exit 0
         } else {
@@ -162,7 +151,7 @@ try {
     Start-DockerDesktop
     
     # Test installation
-    Test-DockerWorking
+    Test-DockerWorkingWithOutput
     
     Write-Phase "Docker installation completed successfully"
     Write-Output "`n🐳 Docker Desktop has been installed and is ready to use!"

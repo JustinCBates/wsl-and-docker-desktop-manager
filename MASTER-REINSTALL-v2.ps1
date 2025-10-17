@@ -15,6 +15,9 @@ $ErrorActionPreference = "Stop"
 # Set console encoding for proper emoji display
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
+# Import status functions
+. "$PSScriptRoot\scripts\status\Get-SystemStatus.ps1"
+
 function Write-Header {
     param([string]$Title)
     Write-Host "`n" -NoNewline
@@ -34,34 +37,12 @@ function Test-AdminRights {
 }
 
 function Get-SystemState {
-    $state = @{
-        WSLInstalled = $false
-        DockerInstalled = $false
-        BackupExists = $false
+    $systemStatus = Get-SystemStatus
+    return @{
+        WSLInstalled = $systemStatus.Summary.WSLReady
+        DockerInstalled = $systemStatus.Summary.DockerReady
+        BackupExists = $systemStatus.Summary.BackupExists
     }
-    
-    # Check WSL
-    try {
-        & wsl --status 2>$null | Out-Null
-        $state.WSLInstalled = $LASTEXITCODE -eq 0
-    }
-    catch {
-        $state.WSLInstalled = $false
-    }
-    
-    # Check Docker
-    try {
-        & docker --version 2>$null | Out-Null
-        $state.DockerInstalled = $LASTEXITCODE -eq 0
-    }
-    catch {
-        $state.DockerInstalled = $false
-    }
-    
-    # Check backup
-    $state.BackupExists = Test-Path $BackupPath -and (Get-ChildItem $BackupPath -ErrorAction SilentlyContinue).Count -gt 0
-    
-    return $state
 }
 
 function Invoke-ScriptPhase {

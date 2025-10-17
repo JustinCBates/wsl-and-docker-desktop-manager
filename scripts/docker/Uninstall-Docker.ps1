@@ -6,6 +6,9 @@ param(
 # Set error handling
 $ErrorActionPreference = "Stop"
 
+# Import Docker status functions
+. "$PSScriptRoot\..\status\Get-DockerStatus.ps1"
+
 function Write-Phase {
     param([string]$Message)
     Write-Output "`n📋 Docker Uninstall: $Message"
@@ -187,16 +190,7 @@ try {
     }
     
     # Check if Docker is installed
-    $dockerInstalled = $false
-    try {
-        & docker --version 2>$null | Out-Null
-        $dockerInstalled = $LASTEXITCODE -eq 0
-    }
-    catch {
-        $dockerInstalled = $false
-    }
-    
-    if (-not $dockerInstalled -and -not $Force) {
+    if (-not (Test-DockerInstalled) -and -not $Force) {
         Write-Output "✅ Docker is not installed"
         exit 0
     }

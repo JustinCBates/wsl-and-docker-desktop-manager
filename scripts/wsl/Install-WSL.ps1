@@ -5,6 +5,9 @@ param(
 # Set error handling
 $ErrorActionPreference = "Stop"
 
+# Import WSL status functions
+. "$PSScriptRoot\..\status\Get-WSLStatus.ps1"
+
 function Write-Phase {
     param([string]$Message)
     Write-Output "`n📋 WSL Install: $Message"
@@ -86,16 +89,7 @@ try {
     }
     
     # Check if WSL is already installed and working
-    $wslInstalled = $false
-    try {
-        $wslVersion = & wsl --status 2>$null
-        $wslInstalled = $LASTEXITCODE -eq 0
-    }
-    catch {
-        $wslInstalled = $false
-    }
-    
-    if ($wslInstalled -and -not $Force) {
+    if ((Test-WSLInstalled) -and -not $Force) {
         Write-Output "✅ WSL is already installed and working"
         exit 0
     }
