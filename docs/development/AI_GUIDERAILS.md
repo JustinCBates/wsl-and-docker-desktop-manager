@@ -29,6 +29,11 @@ Notes
 - This file is intended to remain in `docs/development/` and should not be referenced directly from `main`.
 - If a case-only rename is needed on a case-insensitive file system (for example to change `AI_Guiderails.md` -> `AI_GUIDERAILS.md`), perform the rename by creating the new file and deleting the old one to ensure Git records the change reliably on Windows.
 
+Explicit prohibition
+
+- Creating new top-level packages under `src/` is forbidden unless the repository owner provides explicit written approval listing the exact files and directories to be created. This includes names like `src/wsl_docker_manager/`, `src/my_new_pkg/`, or any other new top-level package/directory. The assistant must NOT introduce such packages.
+
+
 <!-- End of development guiderails -->
 <!-- Canonical development guiderails file with uppercase name -->
 
