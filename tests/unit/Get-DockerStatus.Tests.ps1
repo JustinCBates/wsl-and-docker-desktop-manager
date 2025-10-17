@@ -73,7 +73,7 @@ Server:
     }
 }
 
-Describe "Get-DockerContainers" {
+Describe "Get-DockerContainer" {
     Context "When containers exist" {
         BeforeAll {
             Mock docker {
@@ -86,7 +86,7 @@ def456         redis:alpine   Exited (0) 10 minutes ago
         }
         
         It "Should return container information" {
-            $result = Get-DockerContainers
+            $result = Get-DockerContainer
             $result | Should -Not -BeNullOrEmpty
         }
     }
@@ -97,12 +97,12 @@ def456         redis:alpine   Exited (0) 10 minutes ago
         }
         
         It "Should handle no containers gracefully" {
-            { Get-DockerContainers } | Should -Not -Throw
+            { Get-DockerContainer } | Should -Not -Throw
         }
     }
 }
 
-Describe "Get-DockerImages" {
+Describe "Get-DockerImage" {
     Context "When images exist" {
         BeforeAll {
             Mock docker {
@@ -115,13 +115,13 @@ redis         alpine    789ghi012jkl   5 days ago     32.3MB
         }
         
         It "Should return image information" {
-            $result = Get-DockerImages
+            $result = Get-DockerImage
             $result | Should -Not -BeNullOrEmpty
         }
     }
 }
 
-Describe "Get-DockerVolumes" {
+Describe "Get-DockerVolume" {
     Context "When volumes exist" {
         BeforeAll {
             Mock docker {
@@ -134,7 +134,7 @@ local     postgres_data
         }
         
         It "Should return volume information" {
-            $result = Get-DockerVolumes
+            $result = Get-DockerVolume
             $result | Should -Not -BeNullOrEmpty
         }
     }

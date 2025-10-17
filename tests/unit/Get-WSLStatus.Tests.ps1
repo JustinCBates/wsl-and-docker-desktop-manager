@@ -50,7 +50,7 @@ docker-desktop-data
     }
 }
 
-Describe "Get-WSLDistributions" {
+Describe "Get-WSLDistribution" {
     Context "When distributions are installed" {
         BeforeAll {
             Mock wsl {
@@ -63,12 +63,12 @@ Describe "Get-WSLDistributions" {
         }
         
         It "Should return list of distributions" {
-            $result = Get-WSLDistributions
+            $result = Get-WSLDistribution
             $result | Should -Not -BeNullOrEmpty
         }
         
         It "Should parse distribution names correctly" {
-            $result = Get-WSLDistributions
+            $result = Get-WSLDistribution
             $result | Should -Contain "Ubuntu-22.04"
         }
     }
@@ -79,12 +79,12 @@ Describe "Get-WSLDistributions" {
         }
         
         It "Should handle no distributions gracefully" {
-            { Get-WSLDistributions } | Should -Not -Throw
+            { Get-WSLDistribution } | Should -Not -Throw
         }
     }
 }
 
-Describe "Get-WSLRunningDistributions" {
+Describe "Get-WSLRunningDistribution" {
     Context "When distributions are running" {
         BeforeAll {
             Mock wsl {
@@ -98,7 +98,7 @@ Describe "Get-WSLRunningDistributions" {
         }
         
         It "Should return only running distributions" {
-            $result = Get-WSLRunningDistributions
+            $result = Get-WSLRunningDistribution
             $result | Should -Not -BeNullOrEmpty
         }
     }

@@ -96,7 +96,7 @@ function Get-DockerVersion {
     }
 }
 
-function Get-DockerContainers {
+function Get-DockerContainer {
     """
     Get information about Docker containers
     Returns: Hashtable with container counts
@@ -136,7 +136,7 @@ function Get-DockerContainers {
     }
 }
 
-function Get-DockerImages {
+function Get-DockerImage {
     """
     Get information about Docker images
     Returns: Hashtable with image information
@@ -169,7 +169,7 @@ function Get-DockerImages {
     }
 }
 
-function Get-DockerVolumes {
+function Get-DockerVolume {
     """
     Get information about Docker volumes
     Returns: Hashtable with volume information
@@ -212,9 +212,9 @@ function Get-DockerStatus {
         Running = Test-DockerRunning
         Working = $false
         Version = Get-DockerVersion
-        Containers = Get-DockerContainers
-        Images = Get-DockerImages
-        Volumes = Get-DockerVolumes
+        Containers = Get-DockerContainer
+        Images = Get-DockerImage
+        Volumes = Get-DockerVolume
     }
     
     # Only test if Docker is working if it's running (to avoid long timeouts)

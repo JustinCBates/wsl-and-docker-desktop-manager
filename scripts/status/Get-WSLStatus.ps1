@@ -45,7 +45,7 @@ function Test-VirtualMachinePlatformEnabled {
     }
 }
 
-function Get-WSLDistributions {
+function Get-WSLDistribution {
     """
     Get list of installed WSL distributions
     Returns: Array of distribution names
@@ -62,7 +62,7 @@ function Get-WSLDistributions {
     }
 }
 
-function Get-WSLRunningDistributions {
+function Get-WSLRunningDistribution {
     """
     Get list of currently running WSL distributions
     Returns: Array of running distribution names
@@ -120,8 +120,8 @@ function Get-WSLStatus {
         Installed = Test-WSLInstalled
         FeatureEnabled = Test-WSLFeatureEnabled
         VirtualMachinePlatformEnabled = Test-VirtualMachinePlatformEnabled
-        Distributions = Get-WSLDistributions
-        RunningDistributions = Get-WSLRunningDistributions
+        Distributions = Get-WSLDistribution
+        RunningDistributions = Get-WSLRunningDistribution
         Version = Get-WSLVersion
     }
     

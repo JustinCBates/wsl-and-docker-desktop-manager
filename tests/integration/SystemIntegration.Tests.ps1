@@ -42,7 +42,7 @@ Describe "WSL Status Integration" -Tag "Integration" {
         }
         
         It "Should handle wsl command execution" {
-            { Get-WSLDistributions } | Should -Not -Throw
+            { Get-WSLDistribution } | Should -Not -Throw
         }
         
         It "Should report feature status" {

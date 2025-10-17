@@ -66,7 +66,7 @@ function Show-BackupInfo {
     }
 }
 
-function Restore-DockerImages {
+function Restore-DockerImage {
     param([string]$BackupDir)
     
     Write-Phase "Restoring Docker images"
@@ -111,7 +111,7 @@ function Restore-DockerImages {
     }
 }
 
-function Restore-DockerVolumes {
+function Restore-DockerVolume {
     param([string]$BackupDir)
     
     Write-Phase "Restoring Docker volumes"
@@ -150,7 +150,7 @@ function Restore-DockerVolumes {
     }
 }
 
-function Restore-DockerConfigs {
+function Restore-DockerConfig {
     param([string]$BackupDir)
     
     Write-Phase "Restoring Docker configuration"
@@ -235,13 +235,13 @@ try {
     }
     
     # Restore Docker images
-    Restore-DockerImages -BackupDir $BackupPath
+    Restore-DockerImage -BackupDir $BackupPath
     
     # Restore Docker volumes
-    Restore-DockerVolumes -BackupDir $BackupPath
+    Restore-DockerVolume -BackupDir $BackupPath
     
     # Restore Docker configurations
-    Restore-DockerConfigs -BackupDir $BackupPath
+    Restore-DockerConfig -BackupDir $BackupPath
     
     Write-Phase "Docker data restore completed successfully"
     Write-Output "ðŸ“ Restored from: $BackupPath"
