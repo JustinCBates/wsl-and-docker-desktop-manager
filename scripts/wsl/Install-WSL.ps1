@@ -1,3 +1,5 @@
+# Parameters for WSL installation
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [switch]$Force = $false
 )

@@ -94,7 +94,7 @@ function Get-WSLVersion {
         }
     }
     catch {
-        # Fall back to checking if WSL 1 or 2
+        Write-Verbose "Unable to get WSL version details: $($_.Exception.Message)"
     }
     
     # Check if any WSL is available

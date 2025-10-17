@@ -20,7 +20,6 @@ Write-Host "🐳 Docker Desktop Installation with WSL 2 Backend Starting..." -Fo
 # Function to test WSL 2 availability
 function Test-WSL2Ready {
     try {
-        $wslVersion = wsl --status 2>$null
         $wslList = wsl --list --verbose 2>$null
         
         if ($wslList -match "VERSION\s+2") {

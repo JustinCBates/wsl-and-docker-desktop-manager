@@ -2,6 +2,7 @@
 # This script orchestrates the complete reinstallation process
 # Run as Administrator
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [ValidateSet("backup", "uninstall-docker", "uninstall-wsl", "install-wsl", "install-docker", "restore", "all")]
     [string]$Phase = "all",

@@ -18,6 +18,7 @@ function Write-StatusHeader {
 }
 
 function Write-StatusLine {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Color')]
     param(
         [string]$Label,
         [string]$Status,
