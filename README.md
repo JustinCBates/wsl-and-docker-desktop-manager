@@ -54,9 +54,10 @@ Perfect for when you need to:
 ```
 
 ### Option 2: Step-by-Step Manual Process
+> Note: Backup and restore scripts have been removed from this repository. The following steps focus on uninstalling and reinstalling WSL and Docker. If you manage backups externally, perform them before running these scripts.
+
 ```powershell
-# 1. Backup your Docker data
-.\BACKUP-DOCKER-DATA.ps1
+# 1. (Optional) Ensure you have your own backup of Docker data outside this repo
 
 # 2. Uninstall Docker Desktop
 .\UNINSTALL-DOCKER-DESKTOP.ps1
@@ -70,8 +71,7 @@ Perfect for when you need to:
 # 5. Install Docker Desktop with WSL 2 backend
 .\INSTALL-DOCKER-DESKTOP.ps1
 
-# 6. Restore your data
-# (Navigate to backup folder and run RESTORE-DOCKER-DATA.ps1)
+# 6. Restore your data using your own backup tooling
 ```
 
 ## 📁 Script Overview
@@ -79,7 +79,7 @@ Perfect for when you need to:
 | Script | Purpose | Estimated Time |
 |--------|---------|----------------|
 | `MASTER-REINSTALL.ps1` | 🎛️ Orchestrates entire process | 2-3 hours |
-| `BACKUP-DOCKER-DATA.ps1` | 💾 Backs up containers, images, volumes | 15-30 min |
+| `BACKUP-DOCKER-DATA.ps1` | REMOVED (backup functionality was intentionally removed) | N/A |
 | `UNINSTALL-DOCKER-DESKTOP.ps1` | 🗑️ Completely removes Docker Desktop | 10-15 min |
 | `UNINSTALL-WSL.ps1` | 🗑️ Removes WSL and all distributions | 10-15 min |
 | `INSTALL-WSL2-DYNAMIC.ps1` | 🔧 Installs WSL 2 with dynamic storage | 20-30 min |

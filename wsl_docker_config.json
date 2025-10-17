@@ -1,0 +1,20 @@
+{
+  "installation": {
+    "use_case": null,
+    "run_system_check": true
+  },
+  "wsl_config": {
+    "memory_strategy": "Automatic (50% of system RAM, max 8GB)",
+    "disk_strategy": "Dynamic allocation (starts small, grows as needed)"
+  },
+  "integrations": {
+    "linux_commands_enabled": null
+  },
+  "docker_config": {
+    "auto_cleanup": true,
+    "hyper_v": true
+  },
+  "execution": {
+    "confirmed": true
+  }
+}

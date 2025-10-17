@@ -1,4 +1,4 @@
-# WSL Uninstall Script
+﻿# WSL Uninstall Script
 # This script removes WSL 2 and all distributions to prepare for clean reinstallation
 # Run as Administrator
 
@@ -9,33 +9,33 @@ param(
 
 # Check for admin privileges
 if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "❌ This script requires Administrator privileges" -ForegroundColor Red
-    Write-Host "Please run PowerShell as Administrator and try again" -ForegroundColor Yellow
+    Write-Error "âŒ This script requires Administrator privileges"
+    Write-Warning "Please run PowerShell as Administrator and try again"
     exit 1
 }
 
-Write-Host "🗑️  WSL Complete Uninstall Starting..." -ForegroundColor Red
-Write-Host "⚠️  This will remove ALL WSL distributions and data" -ForegroundColor Yellow
+Write-Information "ðŸ—‘ï¸  WSL Complete Uninstall Starting..." -Tags Title
+Write-Warning "âš ï¸  This will remove ALL WSL distributions and data"
 
 if (-not $Force) {
     $confirm = Read-Host "Are you sure you want to continue? This will delete all WSL data! (yes/no)"
-    if ($confirm -ne "yes") {
-        Write-Host "❌ Uninstall cancelled by user" -ForegroundColor Yellow
+        if ($confirm -ne "yes") {
+        Write-Warning "âŒ Uninstall cancelled by user"
         exit 0
     }
 }
 
 # Create backup directory
-Write-Host "`n📁 Creating backup directory: $BackupPath" -ForegroundColor Cyan
+Write-Information "`nðŸ“ Creating backup directory: $BackupPath" -Tags Info
 New-Item -ItemType Directory -Path $BackupPath -Force | Out-Null
 
 # 1. List and backup WSL distributions
-Write-Host "`n📋 Checking current WSL distributions..." -ForegroundColor Cyan
+Write-Information "`nðŸ“‹ Checking current WSL distributions..." -Tags Info
 try {
     $wslList = wsl --list --verbose 2>$null
     if ($wslList) {
-        Write-Host "Current WSL distributions:" -ForegroundColor White
-        $wslList | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
+        Write-Information "Current WSL distributions:" -Tags Info
+        $wslList | ForEach-Object { Write-Information "  $_" -Tags Info }
         
         # Save the list to backup
         $wslList | Out-File -FilePath (Join-Path $BackupPath "wsl-distributions-before-removal.txt") -Encoding UTF8
@@ -43,7 +43,7 @@ try {
         # Offer to export distributions
         $exportChoice = Read-Host "`nDo you want to export WSL distributions before removal? (yes/no)"
         if ($exportChoice -eq "yes") {
-            Write-Host "📦 Exporting WSL distributions..." -ForegroundColor Cyan
+            Write-Information "ðŸ“¦ Exporting WSL distributions..." -Tags Info
             
             # Get distribution names (skip header and parse)
             $distributions = wsl --list --quiet 2>$null | Where-Object { $_ -and $_.Trim() -ne "" }
@@ -52,35 +52,35 @@ try {
                 $distroName = $distro.Trim()
                 if ($distroName) {
                     $exportFile = Join-Path $BackupPath "$distroName.tar"
-                    Write-Host "  📦 Exporting $distroName..." -ForegroundColor White
+                    Write-Information "  ðŸ“¦ Exporting $distroName..." -Tags Info
                     try {
                         wsl --export $distroName $exportFile
-                        Write-Host "  ✅ $distroName exported successfully" -ForegroundColor Green
+                        Write-Information "  âœ… $distroName exported successfully" -Tags Success
                     } catch {
-                        Write-Host "  ⚠️  Failed to export $distroName`: $_" -ForegroundColor Yellow
+                        Write-Warning "  âš ï¸  Failed to export $distroName`: $_"
                     }
                 }
             }
         }
     } else {
-        Write-Host "  ℹ️  No WSL distributions found" -ForegroundColor Blue
+        Write-Information "  â„¹ï¸  No WSL distributions found" -Tags Info
     }
 } catch {
-    Write-Host "  ⚠️  Could not list WSL distributions: $_" -ForegroundColor Yellow
+    Write-Warning "  âš ï¸  Could not list WSL distributions: $_"
 }
 
 # 2. Shutdown WSL
-Write-Host "`n🛑 Shutting down WSL..." -ForegroundColor Cyan
+Write-Information "`nðŸ›‘ Shutting down WSL..." -Tags Phase
 try {
     wsl --shutdown
     Start-Sleep -Seconds 3
-    Write-Host "  ✅ WSL shutdown completed" -ForegroundColor Green
+    Write-Information "  âœ… WSL shutdown completed" -Tags Success
 } catch {
-    Write-Host "  ⚠️  WSL shutdown failed: $_" -ForegroundColor Yellow
+    Write-Warning "  âš ï¸  WSL shutdown failed: $_"
 }
 
 # 3. Unregister all WSL distributions
-Write-Host "`n🗑️  Unregistering WSL distributions..." -ForegroundColor Cyan
+Write-Information "`nðŸ—‘ï¸  Unregistering WSL distributions..." -Tags Phase
 try {
     $distributions = wsl --list --quiet 2>$null | Where-Object { $_ -and $_.Trim() -ne "" }
     
@@ -88,24 +88,24 @@ try {
         foreach ($distro in $distributions) {
             $distroName = $distro.Trim()
             if ($distroName) {
-                Write-Host "  🗑️  Unregistering $distroName..." -ForegroundColor White
+                Write-Information "  ðŸ—‘ï¸  Unregistering $distroName..." -Tags Info
                 try {
                     wsl --unregister $distroName
-                    Write-Host "  ✅ $distroName unregistered successfully" -ForegroundColor Green
+                    Write-Information "  âœ… $distroName unregistered successfully" -Tags Success
                 } catch {
-                    Write-Host "  ⚠️  Failed to unregister $distroName`: $_" -ForegroundColor Yellow
+                    Write-Warning "  âš ï¸  Failed to unregister $distroName`: $_"
                 }
             }
         }
     } else {
-        Write-Host "  ℹ️  No distributions to unregister" -ForegroundColor Blue
+        Write-Information "  â„¹ï¸  No distributions to unregister" -Tags Info
     }
 } catch {
-    Write-Host "  ⚠️  Could not unregister distributions: $_" -ForegroundColor Yellow
+    Write-Warning "  âš ï¸  Could not unregister distributions: $_"
 }
 
 # 4. Remove WSL directories
-Write-Host "`n🧹 Cleaning up WSL directories..." -ForegroundColor Cyan
+Write-Information "`nðŸ§¹ Cleaning up WSL directories..." -Tags Phase
 
 $wslPaths = @(
     @{Path = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsSubsystemForLinux_8wekyb3d8bbwe"; Description = "WSL Package Data"},
@@ -124,33 +124,33 @@ foreach ($item in $wslPaths) {
         foreach ($path in $matchingPaths) {
             if (Test-Path $path.FullName) {
                 try {
-                    Write-Host "  🗑️  Removing $($item.Description): $($path.Name)..." -ForegroundColor White
+                    Write-Information "  ðŸ—‘ï¸  Removing $($item.Description): $($path.Name)..." -Tags Info
                     Remove-Item -Path $path.FullName -Recurse -Force
-                    Write-Host "  ✅ $($path.Name) removed" -ForegroundColor Green
+                    Write-Information "  âœ… $($path.Name) removed" -Tags Success
                 } catch {
-                    Write-Host "  ⚠️  Could not remove $($path.Name): $_" -ForegroundColor Yellow
+                    Write-Warning "  âš ï¸  Could not remove $($path.Name): $_"
                 }
             }
         }
     } else {
         if (Test-Path $item.Path) {
             try {
-                Write-Host "  🗑️  Removing $($item.Description)..." -ForegroundColor White
+                Write-Information "  ðŸ—‘ï¸  Removing $($item.Description)..." -Tags Info
                 if ($item.Path.EndsWith('.wslconfig')) {
                     # Backup .wslconfig before removing
                     Copy-Item $item.Path -Destination (Join-Path $BackupPath ".wslconfig.backup")
                 }
                 Remove-Item -Path $item.Path -Recurse -Force
-                Write-Host "  ✅ $($item.Description) removed" -ForegroundColor Green
+                Write-Information "  âœ… $($item.Description) removed" -Tags Success
             } catch {
-                Write-Host "  ⚠️  Could not remove $($item.Description): $_" -ForegroundColor Yellow
+                Write-Warning "  âš ï¸  Could not remove $($item.Description): $_"
             }
         }
     }
 }
 
 # 5. Disable WSL Windows Features
-Write-Host "`n🔧 Disabling WSL Windows Features..." -ForegroundColor Cyan
+Write-Information "`nðŸ”§ Disabling WSL Windows Features..." -Tags Phase
 
 $wslFeatures = @(
     "Microsoft-Windows-Subsystem-Linux",
@@ -161,19 +161,19 @@ foreach ($feature in $wslFeatures) {
     try {
         $featureStatus = Get-WindowsOptionalFeature -Online -FeatureName $feature
         if ($featureStatus.State -eq "Enabled") {
-            Write-Host "  🔧 Disabling $feature..." -ForegroundColor White
+            Write-Information "  ðŸ”§ Disabling $feature..." -Tags Info
             Disable-WindowsOptionalFeature -Online -FeatureName $feature -NoRestart
-            Write-Host "  ✅ $feature disabled" -ForegroundColor Green
+            Write-Information "  âœ… $feature disabled" -Tags Success
         } else {
-            Write-Host "  ⏭️  $feature already disabled" -ForegroundColor Gray
+            Write-Information "  â­ï¸  $feature already disabled" -Tags Info
         }
     } catch {
-        Write-Host "  ⚠️  Could not disable $feature`: $_" -ForegroundColor Yellow
+        Write-Warning "  âš ï¸  Could not disable $feature`: $_"
     }
 }
 
 # 6. Clean up registry entries
-Write-Host "`n📋 Cleaning up WSL registry entries..." -ForegroundColor Cyan
+Write-Information "`nðŸ“‹ Cleaning up WSL registry entries..." -Tags Info
 $registryPaths = @(
     "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss",
     "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Lxss"
@@ -186,17 +186,17 @@ foreach ($regPath in $registryPaths) {
             $regBackupFile = Join-Path $BackupPath "$($regPath.Replace(':', '').Replace('\', '_')).reg"
             reg export $regPath.Replace('HKCU:', 'HKEY_CURRENT_USER').Replace('HKLM:', 'HKEY_LOCAL_MACHINE') $regBackupFile /y 2>$null
             
-            Write-Host "  🗑️  Removing registry: $regPath..." -ForegroundColor White
+            Write-Information "  ðŸ—‘ï¸  Removing registry: $regPath..." -Tags Info
             Remove-Item -Path $regPath -Recurse -Force
-            Write-Host "  ✅ Registry entry removed" -ForegroundColor Green
+            Write-Information "  âœ… Registry entry removed" -Tags Success
         } catch {
-            Write-Host "  ⚠️  Could not remove registry entry $regPath`: $_" -ForegroundColor Yellow
+            Write-Warning "  âš ï¸  Could not remove registry entry $regPath`: $_"
         }
     }
 }
 
 # 7. Create restoration info
-Write-Host "`n📝 Creating restoration information..." -ForegroundColor Cyan
+Write-Information "`nðŸ“ Creating restoration information..." -Tags Info
 $restorationInfo = @"
 # WSL Restoration Information
 # Generated on: $(Get-Date)
@@ -238,17 +238,17 @@ $( if (Test-Path "$BackupPath\.wslconfig.backup") {
 $restorationInfo | Out-File -FilePath (Join-Path $BackupPath "RESTORATION-INFO.txt") -Encoding UTF8
 
 # 8. Summary
-Write-Host "`n✅ WSL uninstall completed!" -ForegroundColor Green
-Write-Host "📁 Backup location: $BackupPath" -ForegroundColor Yellow
+Write-Information "`nâœ… WSL uninstall completed!" -Tags Success
+Write-Information "ðŸ“ Backup location: $BackupPath" -Tags Info
 
-Write-Host "`n🔄 Next steps:" -ForegroundColor Green
-Write-Host "1. RESTART your computer (required for feature changes)" -ForegroundColor White
-Write-Host "2. After restart, run the WSL 2 reinstallation script" -ForegroundColor White
-Write-Host "3. Configure WSL 2 with dynamic disk allocation" -ForegroundColor White
+Write-Information "`nðŸ”„ Next steps:" -Tags Info
+Write-Information "1. RESTART your computer (required for feature changes)" -Tags Info
+Write-Information "2. After restart, run the WSL 2 reinstallation script" -Tags Info
+Write-Information "3. Configure WSL 2 with dynamic disk allocation" -Tags Info
 
-Write-Host "`n⚠️  Important:" -ForegroundColor Yellow
-Write-Host "- A restart is REQUIRED for Windows features to be fully disabled" -ForegroundColor White
-Write-Host "- Keep the backup folder safe until WSL is successfully reinstalled" -ForegroundColor White
-Write-Host "- The next script will reinstall WSL 2 with improved disk management" -ForegroundColor White
+Write-Warning "`nâš ï¸  Important:"
+Write-Information "- A restart is REQUIRED for Windows features to be fully disabled" -Tags Info
+Write-Information "- Keep the backup folder safe until WSL is successfully reinstalled" -Tags Info
+Write-Information "- The next script will reinstall WSL 2 with improved disk management" -Tags Info
 
-Write-Host "`n🔄 Restart required - please restart your computer before continuing" -ForegroundColor Red
+Write-Warning "`nðŸ”„ Restart required - please restart your computer before continuing"
