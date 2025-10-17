@@ -26,15 +26,15 @@ $script:testResults = $null
 
 function Write-TestHeader {
     param([string]$Title)
-    Write-Host "`n" -NoNewline
-    Write-Host "=" * 80 -ForegroundColor Cyan
-    Write-Host "  $Title" -ForegroundColor Green
-    Write-Host "=" * 80 -ForegroundColor Cyan
+    Write-Output "`n" -NoNewline
+    Write-Output ("=" * 80)
+    Write-Output "  $Title"
+    Write-Output ("=" * 80)
 }
 
 function Write-TestSection {
     param([string]$Message)
-    Write-Host "`n>> $Message" -ForegroundColor Yellow
+    Write-Output "`n>> $Message"
 }
 
 function Get-LintingIssue {
@@ -203,7 +203,7 @@ function Export-TodoListFile {
     
     if ($PSCmdlet.ShouldProcess($todoFile, "Create/Update TODO.md file")) {
         Set-Content -Path $todoFile -Value $content -Encoding UTF8
-        Write-Host "`nâœ… Todo list exported to: $todoFile" -ForegroundColor Green
+    Write-Output "`nâœ… Todo list exported to: $todoFile"
     }
 }
 
@@ -230,29 +230,29 @@ try {
         
         $script:testResults = Invoke-Pester -Configuration $pesterConfig
         
-        Write-Host "`nðŸ“Š TEST SUMMARY:" -ForegroundColor Cyan
-        Write-Host "  Total: $($testResults.TotalCount)" -ForegroundColor White
-        Write-Host "  Passed: $($testResults.PassedCount)" -ForegroundColor Green
-        Write-Host "  Failed: $($testResults.FailedCount)" -ForegroundColor $(if($testResults.FailedCount -gt 0){"Red"}else{"Green"})
-        Write-Host "  Skipped: $($testResults.SkippedCount)" -ForegroundColor Yellow
+    Write-Output "`nðŸ"‹ TEST SUMMARY:"
+    Write-Output "  Total: $($testResults.TotalCount)"
+    Write-Output "  Passed: $($testResults.PassedCount)"
+    Write-Output "  Failed: $($testResults.FailedCount)"
+    Write-Output "  Skipped: $($testResults.SkippedCount)"
     }
     
     # Run Linting
     if (-not $SkipLinting) {
         $script:lintingIssues = Get-LintingIssue
         
-        Write-Host "`nðŸ"‹ LINTING SUMMARY:" -ForegroundColor Cyan
-        $errorCount = ($lintingIssues | Where-Object Severity -in "Error","error").Count
-        $warningCount = ($lintingIssues | Where-Object Severity -in "Warning","warning").Count
+    Write-Output "`nðŸ"‹ LINTING SUMMARY:"
+    $errorCount = ($lintingIssues | Where-Object Severity -in "Error","error").Count
+    $warningCount = ($lintingIssues | Where-Object Severity -in "Warning","warning").Count
         
-        Write-Host "  Errors: $errorCount" -ForegroundColor $(if($errorCount -gt 0){"Red"}else{"Green"})
-        Write-Host "  Warnings: $warningCount" -ForegroundColor $(if($warningCount -gt 0){"Yellow"}else{"Green"})
+    Write-Output "  Errors: $errorCount"
+    Write-Output "  Warnings: $warningCount"
         
         if ($Detailed -and $lintingIssues.Count -gt 0) {
-            Write-Host "`n  Top Issues:" -ForegroundColor White
+            Write-Output "`n  Top Issues:"
             $topIssues = $lintingIssues | Group-Object Rule | Sort-Object Count -Descending | Select-Object -First 5
             foreach ($issue in $topIssues) {
-                Write-Host "    - $($issue.Name): $($issue.Count) occurrences" -ForegroundColor Gray
+                Write-Output "    - $($issue.Name): $($issue.Count) occurrences"
             }
         }
     }
@@ -268,16 +268,16 @@ try {
     $hasFailedTests = $testResults -and $testResults.FailedCount -gt 0
     
     if ($hasErrors -or $hasFailedTests) {
-        Write-Host "`nâŒ QUALITY CHECK FAILED" -ForegroundColor Red
+        Write-Error "`nâŒ QUALITY CHECK FAILED"
         exit 1
     }
     else {
-        Write-Host "`nâœ… QUALITY CHECK PASSED" -ForegroundColor Green
+        Write-Output "`nâœ… QUALITY CHECK PASSED"
         exit 0
     }
 }
 catch {
-    Write-Host "`nâŒ ERROR: $_" -ForegroundColor Red
-    Write-Host $_.ScriptStackTrace -ForegroundColor Red
+    Write-Error "`nâŒ ERROR: $_"
+    Write-Error $_.ScriptStackTrace
     exit 1
 }

@@ -32,20 +32,19 @@ foreach ($file in $files) {
         try {
             $content = Get-Content -Path $fullPath -Raw
             [System.IO.File]::WriteAllText($fullPath, $content, $utf8WithBom)
-            Write-Host "âœ… Added BOM to: $file" -ForegroundColor Green
+            Write-Output "âœ… Added BOM to: $file"
             $successCount++
         }
         catch {
-            Write-Host "âŒ Failed to process: $file - $_" -ForegroundColor Red
+            Write-Error "âŒ Failed to process: $file - $_"
             $errorCount++
         }
     }
     else {
-        Write-Host "âš ï¸  File not found: $file" -ForegroundColor Yellow
+        Write-Warning "âš ï¸  File not found: $file"
         $errorCount++
     }
 }
-
-Write-Host "`n=== SUMMARY ===" -ForegroundColor Cyan
-Write-Host "Successfully processed: $successCount files" -ForegroundColor Green
-Write-Host "Errors: $errorCount files" -ForegroundColor $(if($errorCount -gt 0){"Red"}else{"Green"})
+Write-Output "`n=== SUMMARY ==="
+Write-Output "Successfully processed: $successCount files"
+if ($errorCount -gt 0) { Write-Error "Errors: $errorCount files" } else { Write-Output "Errors: $errorCount files" }
