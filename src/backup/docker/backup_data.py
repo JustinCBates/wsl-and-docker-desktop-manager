@@ -1,4 +1,7 @@
 """Placeholder for src/backup/docker/Backup-Data.ps1"""
+from step_result import StepResult
 
 def backup_data(dry_run=True):
-    return {"name": "backup_data", "status": "Skipped" if dry_run else "Success", "message": "MOCK: backup data (no-op)"}
+    if dry_run:
+        return StepResult.now(name="backup_data", status="Skipped", message="Dry-run: backup data")
+    return StepResult.now(name="backup_data", status="Success", message="MOCK: backup data (no-op)")
