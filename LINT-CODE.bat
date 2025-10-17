@@ -18,14 +18,9 @@ echo Running pylint on Python files...
 echo.
 
 if "%1"=="" (
-    echo Linting all Python files in current directory...
-    for %%f in (*.py) do (
-        echo ========================
-        echo Checking: %%f
-        echo ========================
-        pylint %%f
-        echo.
-    )
+    echo Linting all Python files in project...
+    powershell -Command "Get-ChildItem -Path . -Recurse -Filter *.py | ForEach-Object { Write-Host '========================'; Write-Host 'Checking:' $_.Name; Write-Host '========================'; pylint $_.FullName }"
+    echo.
 ) else (
     echo Linting: %1
     pylint %1
