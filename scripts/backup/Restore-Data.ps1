@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$BackupPath = "C:\DockerBackup",
     [switch]$Force = $false
 )
@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 
 function Write-Phase {
     param([string]$Message)
-    Write-Output "`n📋 Restore: $Message"
+    Write-Output "`nðŸ“‹ Restore: $Message"
 }
 
 function Test-DockerRunning {
@@ -53,7 +53,7 @@ function Show-BackupInfo {
         if (Test-Path $manifestPath) {
             $manifest = Get-Content $manifestPath | ConvertFrom-Json
             
-            Write-Output "`n📋 Backup Information:"
+            Write-Output "`nðŸ“‹ Backup Information:"
             Write-Output "  Backup Date: $($manifest.BackupDate)"
             Write-Output "  Original Computer: $($manifest.SystemInfo.ComputerName)"
             Write-Output "  Original User: $($manifest.SystemInfo.UserName)"
@@ -104,7 +104,7 @@ function Restore-DockerImages {
             }
         }
         
-        Write-Output "✅ Docker images restored"
+        Write-Output "âœ… Docker images restored"
     }
     catch {
         Write-Warning "Error restoring Docker images: $_"
@@ -143,7 +143,7 @@ function Restore-DockerVolumes {
             }
         }
         
-        Write-Output "✅ Docker volumes restored"
+        Write-Output "âœ… Docker volumes restored"
     }
     catch {
         Write-Warning "Error restoring Docker volumes: $_"
@@ -196,7 +196,7 @@ function Restore-DockerConfigs {
             }
         }
         
-        Write-Output "✅ Docker configuration restored"
+        Write-Output "âœ… Docker configuration restored"
     }
     catch {
         Write-Warning "Error restoring Docker configuration: $_"
@@ -226,7 +226,7 @@ try {
     
     # Confirm restore operation
     if (-not $Force) {
-        Write-Output "⚠️  This will restore Docker data from backup and may overwrite existing data."
+        Write-Output "âš ï¸  This will restore Docker data from backup and may overwrite existing data."
         $confirm = Read-Host "Do you want to continue? (y/N)"
         if ($confirm -ne 'y' -and $confirm -ne 'Y') {
             Write-Output "Restore operation cancelled"
@@ -244,8 +244,8 @@ try {
     Restore-DockerConfigs -BackupDir $BackupPath
     
     Write-Phase "Docker data restore completed successfully"
-    Write-Output "📁 Restored from: $BackupPath"
-    Write-Output "`n🔄 Docker Desktop may need to be restarted to apply configuration changes."
+    Write-Output "ðŸ“ Restored from: $BackupPath"
+    Write-Output "`nðŸ”„ Docker Desktop may need to be restarted to apply configuration changes."
     Write-Output "Your Docker environment has been restored from backup."
     
     exit 0

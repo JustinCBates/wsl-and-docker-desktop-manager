@@ -1,4 +1,4 @@
-# Parameters for uninstallation orchestration
+﻿# Parameters for uninstallation orchestration
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [Parameter(Mandatory=$true)]
@@ -15,7 +15,7 @@ $ErrorActionPreference = "Stop"
 
 function Write-Phase {
     param([string]$Message)
-    Write-Output "`n📋 $Message" 
+    Write-Output "`nðŸ“‹ $Message" 
 }
 
 function Invoke-UninstallScript {
@@ -34,11 +34,11 @@ function Invoke-UninstallScript {
         }
         
         $result = & $fullPath @Arguments
-        Write-Output "✅ $PhaseName completed successfully"
+        Write-Output "âœ… $PhaseName completed successfully"
         return $result
     }
     catch {
-        Write-Error "❌ $PhaseName failed: $_"
+        Write-Error "âŒ $PhaseName failed: $_"
         throw
     }
 }

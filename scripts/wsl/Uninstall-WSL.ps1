@@ -1,4 +1,4 @@
-# Parameters for WSL uninstallation
+﻿# Parameters for WSL uninstallation
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [string]$BackupPath = "C:\DockerBackup",
@@ -13,7 +13,7 @@ $ErrorActionPreference = "Stop"
 
 function Write-Phase {
     param([string]$Message)
-    Write-Output "`n📋 WSL Uninstall: $Message"
+    Write-Output "`nðŸ“‹ WSL Uninstall: $Message"
 }
 
 function Test-AdminRights {
@@ -31,7 +31,7 @@ function Stop-WSLDistributions {
             Write-Output "Shutting down WSL distributions..."
             & wsl --shutdown
             Start-Sleep -Seconds 3
-            Write-Output "✅ WSL distributions stopped"
+            Write-Output "âœ… WSL distributions stopped"
         } else {
             Write-Output "No running WSL distributions found"
         }
@@ -55,7 +55,7 @@ function Remove-WSLDistributions {
                     & wsl --unregister $distroName
                 }
             }
-            Write-Output "✅ WSL distributions unregistered"
+            Write-Output "âœ… WSL distributions unregistered"
         } else {
             Write-Output "No WSL distributions found to remove"
         }
@@ -83,11 +83,11 @@ function Disable-WSLFeatures {
             Disable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
         }
         
-        Write-Output "✅ WSL features disabled"
+        Write-Output "âœ… WSL features disabled"
         return $true
     }
     catch {
-        Write-Error "❌ Failed to disable WSL features: $_"
+        Write-Error "âŒ Failed to disable WSL features: $_"
         throw
     }
 }
@@ -109,7 +109,7 @@ function Remove-WSLFiles {
             }
         }
         
-        Write-Output "✅ WSL files cleaned up"
+        Write-Output "âœ… WSL files cleaned up"
     }
     catch {
         Write-Warning "Some WSL files could not be removed: $_"
@@ -126,7 +126,7 @@ try {
     
     # Check if WSL is installed
     if (-not (Test-WSLInstalled) -and -not $Force) {
-        Write-Output "✅ WSL is not installed"
+        Write-Output "âœ… WSL is not installed"
         exit 0
     }
     
@@ -158,7 +158,7 @@ try {
     }
     
     if ($restartRequired) {
-        Write-Output "`n⚠️  A restart is required to complete WSL uninstallation"
+        Write-Output "`nâš ï¸  A restart is required to complete WSL uninstallation"
         Write-Output "Please restart your computer to complete the process"
         return "restart"
     }

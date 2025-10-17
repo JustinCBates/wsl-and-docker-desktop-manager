@@ -1,4 +1,4 @@
-param(
+﻿param(
     [switch]$Force = $false
 )
 
@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 
 function Write-Phase {
     param([string]$Message)
-    Write-Output "`n📋 Docker Install: $Message"
+    Write-Output "`nðŸ“‹ Docker Install: $Message"
 }
 
 # Import Docker status functions
@@ -44,10 +44,10 @@ function Install-DockerDesktop {
         # Clean up installer
         Remove-Item $installerPath -Force
         
-        Write-Output "✅ Docker Desktop installed successfully"
+        Write-Output "âœ… Docker Desktop installed successfully"
     }
     catch {
-        Write-Error "❌ Failed to install Docker Desktop: $_"
+        Write-Error "âŒ Failed to install Docker Desktop: $_"
         throw
     }
 }
@@ -83,7 +83,7 @@ function Start-DockerDesktop {
             try {
                 & docker version 2>$null | Out-Null
                 if ($LASTEXITCODE -eq 0) {
-                    Write-Output "✅ Docker is ready"
+                    Write-Output "âœ… Docker is ready"
                     return
                 }
             }
@@ -99,7 +99,7 @@ function Start-DockerDesktop {
         throw "Docker failed to start within $timeout seconds"
     }
     catch {
-        Write-Error "❌ Failed to start Docker Desktop: $_"
+        Write-Error "âŒ Failed to start Docker Desktop: $_"
         throw
     }
 }
@@ -112,7 +112,7 @@ function Test-DockerWorkingWithOutput {
         $result = Test-DockerWorking
         
         if ($result) {
-            Write-Output "✅ Docker is working correctly"
+            Write-Output "âœ… Docker is working correctly"
         } else {
             Write-Warning "Docker test failed"
         }
@@ -137,7 +137,7 @@ try {
     if ((Test-DockerInstalled) -and -not $Force) {
         Write-Output "Docker is already installed. Testing functionality..."
         if (Test-DockerWorkingWithOutput) {
-            Write-Output "✅ Docker is already installed and working"
+            Write-Output "âœ… Docker is already installed and working"
             exit 0
         } else {
             Write-Output "Docker is installed but not working properly. Continuing with installation..."
@@ -154,7 +154,7 @@ try {
     Test-DockerWorkingWithOutput
     
     Write-Phase "Docker installation completed successfully"
-    Write-Output "`n🐳 Docker Desktop has been installed and is ready to use!"
+    Write-Output "`nðŸ³ Docker Desktop has been installed and is ready to use!"
     Write-Output "You can now use Docker commands or the Docker Desktop GUI."
     
     exit 0

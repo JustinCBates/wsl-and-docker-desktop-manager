@@ -1,4 +1,4 @@
-# Parameters available for command-line invocation (used by MVP and other callers)
+﻿# Parameters available for command-line invocation (used by MVP and other callers)
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [Parameter(Position=0)]
@@ -31,7 +31,7 @@ function Write-Header {
 
 function Write-Phase {
     param([string]$Message)
-    Write-Host "`n📋 $Message" -ForegroundColor Yellow
+    Write-Host "`nðŸ“‹ $Message" -ForegroundColor Yellow
 }
 
 function Test-AdminRights {
@@ -64,11 +64,11 @@ function Invoke-ScriptPhase {
         
         $result = & $scriptPath @Arguments
         
-        Write-Host "✅ $PhaseName completed successfully" -ForegroundColor Green
+        Write-Host "âœ… $PhaseName completed successfully" -ForegroundColor Green
         return $result
     }
     catch {
-        Write-Host "❌ $PhaseName failed: $_" -ForegroundColor Red
+        Write-Host "âŒ $PhaseName failed: $_" -ForegroundColor Red
         throw
     }
 }
@@ -79,23 +79,23 @@ function Show-SystemStatus {
     Write-Header "Current System Status"
     Write-Host "WSL Status:    " -NoNewline
     if ($systemState.WSLInstalled) {
-        Write-Host "✅ Installed" -ForegroundColor Green
+        Write-Host "âœ… Installed" -ForegroundColor Green
     } else {
-        Write-Host "❌ Not Installed" -ForegroundColor Red
+        Write-Host "âŒ Not Installed" -ForegroundColor Red
     }
     
     Write-Host "Docker Status: " -NoNewline
     if ($systemState.DockerInstalled) {
-        Write-Host "✅ Installed" -ForegroundColor Green
+        Write-Host "âœ… Installed" -ForegroundColor Green
     } else {
-        Write-Host "❌ Not Installed" -ForegroundColor Red
+        Write-Host "âŒ Not Installed" -ForegroundColor Red
     }
     
     Write-Host "Backup Status: " -NoNewline
     if ($systemState.BackupExists) {
-        Write-Host "✅ Available at $BackupPath" -ForegroundColor Green
+        Write-Host "âœ… Available at $BackupPath" -ForegroundColor Green
     } else {
-        Write-Host "❌ No backup found" -ForegroundColor Red
+        Write-Host "âŒ No backup found" -ForegroundColor Red
     }
     
     return $systemState
@@ -194,7 +194,7 @@ try {
             if ($Force) { $uninstallArgs += "-Force" }
             $result = Invoke-ScriptPhase -ScriptName "Uninstall-Orchestrator.ps1" -PhaseName "Complete Uninstallation" -Arguments $uninstallArgs
             if ($result -eq "restart") { 
-                Write-Host "`n⚠️  System restart required. Please restart and run install phase manually." -ForegroundColor Yellow
+                Write-Host "`nâš ï¸  System restart required. Please restart and run install phase manually." -ForegroundColor Yellow
                 exit 0 
             }
             
@@ -213,7 +213,7 @@ try {
         }
         
         default {
-            Write-Host "❌ Invalid or missing phase parameter" -ForegroundColor Red
+            Write-Host "âŒ Invalid or missing phase parameter" -ForegroundColor Red
             Write-Host "`nUsage: .\MASTER-REINSTALL-v2.ps1 [phase] [options]" -ForegroundColor Yellow
             Write-Host "`nAvailable phases:" -ForegroundColor Yellow
             Write-Host "  backup              - Backup Docker data only"
@@ -235,11 +235,11 @@ try {
     }
     
     Write-Header "Operation Completed Successfully"
-    Write-Host "🎉 All operations completed successfully!" -ForegroundColor Green
+    Write-Host "ðŸŽ‰ All operations completed successfully!" -ForegroundColor Green
     
     exit 0
 }
 catch {
-    Write-Host "`n❌ Operation failed: $_" -ForegroundColor Red
+    Write-Host "`nâŒ Operation failed: $_" -ForegroundColor Red
     exit 1
 }

@@ -1,4 +1,4 @@
-# Parameters for backup operations
+﻿# Parameters for backup operations
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [string]$BackupPath = "C:\DockerBackup",
@@ -10,7 +10,7 @@ $ErrorActionPreference = "Stop"
 
 function Write-Phase {
     param([string]$Message)
-    Write-Output "`n📋 Backup: $Message"
+    Write-Output "`nðŸ“‹ Backup: $Message"
 }
 
 function Test-DockerRunning {
@@ -31,7 +31,7 @@ function Stop-DockerContainers {
         if ($runningContainers) {
             Write-Output "Stopping running containers..."
             & docker stop $runningContainers
-            Write-Output "✅ Containers stopped"
+            Write-Output "âœ… Containers stopped"
         } else {
             Write-Output "No running containers found"
         }
@@ -72,7 +72,7 @@ function Backup-DockerImages {
                         Write-Warning "Failed to backup image: $image"
                     }
                 }
-                Write-Output "✅ Docker images backed up"
+                Write-Output "âœ… Docker images backed up"
             } else {
                 Write-Output "No Docker images found to backup"
             }
@@ -112,7 +112,7 @@ function Backup-DockerVolumes {
                     Write-Warning "Failed to backup volume: $volume"
                 }
             }
-            Write-Output "✅ Docker volumes backed up"
+            Write-Output "âœ… Docker volumes backed up"
         } else {
             Write-Output "No Docker volumes found to backup"
         }
@@ -151,7 +151,7 @@ function Backup-DockerConfigs {
         $contextFile = Join-Path $configBackupPath "docker-contexts.json"
         & docker context ls --format json 2>$null | Out-File -FilePath $contextFile -Encoding UTF8
         
-        Write-Output "✅ Docker configuration backed up"
+        Write-Output "âœ… Docker configuration backed up"
     }
     catch {
         Write-Warning "Error backing up Docker configuration: $_"
@@ -176,7 +176,7 @@ function Create-BackupManifest {
         $manifestPath = Join-Path $BackupDir "backup-manifest.json"
         $manifest | ConvertTo-Json -Depth 3 | Out-File -FilePath $manifestPath -Encoding UTF8
         
-        Write-Output "✅ Backup manifest created"
+        Write-Output "âœ… Backup manifest created"
     }
     catch {
         Write-Warning "Error creating backup manifest: $_"
@@ -221,8 +221,8 @@ try {
     $backupSize = (Get-ChildItem $BackupPath -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
     
     Write-Phase "Docker data backup completed successfully"
-    Write-Output "📁 Backup location: $BackupPath"
-    Write-Output "💾 Backup size: $([math]::Round($backupSize, 2)) MB"
+    Write-Output "ðŸ“ Backup location: $BackupPath"
+    Write-Output "ðŸ’¾ Backup size: $([math]::Round($backupSize, 2)) MB"
     Write-Output "`nYour Docker data has been safely backed up and can be restored later."
     
     exit 0

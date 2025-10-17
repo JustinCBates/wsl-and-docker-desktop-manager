@@ -1,4 +1,4 @@
-# Parameters for Docker uninstallation
+﻿# Parameters for Docker uninstallation
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [string]$BackupPath = "C:\DockerBackup",
@@ -13,7 +13,7 @@ $ErrorActionPreference = "Stop"
 
 function Write-Phase {
     param([string]$Message)
-    Write-Output "`n📋 Docker Uninstall: $Message"
+    Write-Output "`nðŸ“‹ Docker Uninstall: $Message"
 }
 
 function Test-AdminRights {
@@ -47,7 +47,7 @@ function Stop-DockerProcesses {
             $dockerService | Stop-Service -Force
         }
         
-        Write-Output "✅ Docker processes stopped"
+        Write-Output "âœ… Docker processes stopped"
     }
     catch {
         Write-Warning "Error stopping Docker processes: $_"
@@ -77,7 +77,7 @@ function Backup-DockerData {
             Copy-Item $dockerAppDataPath $backupAppPath -Recurse -Force
         }
         
-        Write-Output "✅ Docker data backed up to: $BackupPath"
+        Write-Output "âœ… Docker data backed up to: $BackupPath"
     }
     catch {
         Write-Warning "Error backing up Docker data: $_"
@@ -112,7 +112,7 @@ function Uninstall-DockerDesktop {
             }
         }
         
-        Write-Output "✅ Docker Desktop uninstalled"
+        Write-Output "âœ… Docker Desktop uninstalled"
     }
     catch {
         Write-Warning "Error during Docker Desktop uninstall: $_"
@@ -152,7 +152,7 @@ function Remove-DockerFiles {
             [Environment]::SetEnvironmentVariable("PATH", $newPath, "Machine")
         }
         
-        Write-Output "✅ Docker files cleaned up"
+        Write-Output "âœ… Docker files cleaned up"
     }
     catch {
         Write-Warning "Some Docker files could not be removed: $_"
@@ -176,7 +176,7 @@ function Remove-DockerServices {
             }
         }
         
-        Write-Output "✅ Docker services removed"
+        Write-Output "âœ… Docker services removed"
     }
     catch {
         Write-Warning "Error removing Docker services: $_"
@@ -193,7 +193,7 @@ try {
     
     # Check if Docker is installed
     if (-not (Test-DockerInstalled) -and -not $Force) {
-        Write-Output "✅ Docker is not installed"
+        Write-Output "âœ… Docker is not installed"
         exit 0
     }
     

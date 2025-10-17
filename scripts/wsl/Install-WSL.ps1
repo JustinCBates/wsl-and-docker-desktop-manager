@@ -1,4 +1,4 @@
-# Parameters for WSL installation
+﻿# Parameters for WSL installation
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [switch]$Force = $false
@@ -12,7 +12,7 @@ $ErrorActionPreference = "Stop"
 
 function Write-Phase {
     param([string]$Message)
-    Write-Output "`n📋 WSL Install: $Message"
+    Write-Output "`nðŸ“‹ WSL Install: $Message"
 }
 
 function Test-AdminRights {
@@ -37,11 +37,11 @@ function Enable-WSLFeatures {
             Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
         }
         
-        Write-Output "✅ WSL features enabled"
+        Write-Output "âœ… WSL features enabled"
         return $true
     }
     catch {
-        Write-Error "❌ Failed to enable WSL features: $_"
+        Write-Error "âŒ Failed to enable WSL features: $_"
         throw
     }
 }
@@ -62,10 +62,10 @@ function Install-WSLKernel {
         # Clean up
         Remove-Item $kernelPath -Force
         
-        Write-Output "✅ WSL2 kernel installed"
+        Write-Output "âœ… WSL2 kernel installed"
     }
     catch {
-        Write-Error "❌ Failed to install WSL2 kernel: $_"
+        Write-Error "âŒ Failed to install WSL2 kernel: $_"
         throw
     }
 }
@@ -75,7 +75,7 @@ function Set-WSLVersion {
     
     try {
         & wsl --set-default-version 2
-        Write-Output "✅ WSL default version set to 2"
+        Write-Output "âœ… WSL default version set to 2"
     }
     catch {
         Write-Warning "Could not set WSL default version (this is normal if no distributions are installed yet)"
@@ -92,7 +92,7 @@ try {
     
     # Check if WSL is already installed and working
     if ((Test-WSLInstalled) -and -not $Force) {
-        Write-Output "✅ WSL is already installed and working"
+        Write-Output "âœ… WSL is already installed and working"
         exit 0
     }
     
@@ -121,7 +121,7 @@ try {
     }
     
     if ($restartRequired) {
-        Write-Output "`n⚠️  A restart is required to complete WSL installation"
+        Write-Output "`nâš ï¸  A restart is required to complete WSL installation"
         Write-Output "Please restart your computer and run this script again if needed"
         return "restart"
     }

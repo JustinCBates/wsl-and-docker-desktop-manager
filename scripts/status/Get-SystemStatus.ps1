@@ -1,4 +1,4 @@
-param(
+﻿param(
     [switch]$ShowDetails = $false,
     [switch]$JsonOutput = $false
 )
@@ -35,13 +35,13 @@ function Format-WSLStatus {
     Write-StatusHeader "WSL (Windows Subsystem for Linux) Status"
     
     # Basic status
-    $installStatus = if ($WSLStatus.Installed) { "✅ Installed and Working" } else { "❌ Not Installed" }
+    $installStatus = if ($WSLStatus.Installed) { "âœ… Installed and Working" } else { "âŒ Not Installed" }
     Write-StatusLine "WSL Status" $installStatus
     
-    $featureStatus = if ($WSLStatus.FeatureEnabled) { "✅ Enabled" } else { "❌ Disabled" }
+    $featureStatus = if ($WSLStatus.FeatureEnabled) { "âœ… Enabled" } else { "âŒ Disabled" }
     Write-StatusLine "WSL Feature" $featureStatus
     
-    $vmStatus = if ($WSLStatus.VirtualMachinePlatformEnabled) { "✅ Enabled" } else { "❌ Disabled" }
+    $vmStatus = if ($WSLStatus.VirtualMachinePlatformEnabled) { "âœ… Enabled" } else { "âŒ Disabled" }
     Write-StatusLine "Virtual Machine Platform" $vmStatus
     
     Write-StatusLine "WSL Version" $WSLStatus.Version.Version
@@ -51,7 +51,7 @@ function Format-WSLStatus {
         Write-StatusLine "Installed Distributions" "$($WSLStatus.Distributions.Count) found"
         if ($ShowDetails) {
             foreach ($distro in $WSLStatus.Distributions) {
-                Write-Output "    • $distro"
+                Write-Output "    â€¢ $distro"
             }
         }
     } else {
@@ -62,7 +62,7 @@ function Format-WSLStatus {
         Write-StatusLine "Running Distributions" "$($WSLStatus.RunningDistributions.Count) active"
         if ($ShowDetails) {
             foreach ($distro in $WSLStatus.RunningDistributions) {
-                Write-Output "    • $distro (running)"
+                Write-Output "    â€¢ $distro (running)"
             }
         }
     } else {
@@ -76,17 +76,17 @@ function Format-DockerStatus {
     Write-StatusHeader "Docker Desktop Status"
     
     # Basic status
-    $installStatus = if ($DockerStatus.Installed) { "✅ Installed" } else { "❌ Not Installed" }
+    $installStatus = if ($DockerStatus.Installed) { "âœ… Installed" } else { "âŒ Not Installed" }
     Write-StatusLine "Docker CLI" $installStatus
     
-    $desktopStatus = if ($DockerStatus.DesktopInstalled) { "✅ Installed" } else { "❌ Not Installed" }
+    $desktopStatus = if ($DockerStatus.DesktopInstalled) { "âœ… Installed" } else { "âŒ Not Installed" }
     Write-StatusLine "Docker Desktop" $desktopStatus
     
-    $runningStatus = if ($DockerStatus.Running) { "✅ Running" } else { "❌ Not Running" }
+    $runningStatus = if ($DockerStatus.Running) { "âœ… Running" } else { "âŒ Not Running" }
     Write-StatusLine "Docker Daemon" $runningStatus
     
     if ($DockerStatus.Running) {
-        $workingStatus = if ($DockerStatus.Working) { "✅ Working" } else { "⚠️ Issues Detected" }
+        $workingStatus = if ($DockerStatus.Working) { "âœ… Working" } else { "âš ï¸ Issues Detected" }
         Write-StatusLine "Docker Functionality" $workingStatus
     }
     
@@ -97,7 +97,7 @@ function Format-DockerStatus {
         Write-StatusLine "Containers" "$($DockerStatus.Containers.Running) running / $($DockerStatus.Containers.Total) total"
         if ($ShowDetails -and $DockerStatus.Containers.List.Count -gt 0) {
             foreach ($container in $DockerStatus.Containers.List) {
-                Write-Output "    • $container"
+                Write-Output "    â€¢ $container"
             }
         }
     } else {
@@ -108,7 +108,7 @@ function Format-DockerStatus {
         Write-StatusLine "Images" "$($DockerStatus.Images.Count) images"
         if ($ShowDetails -and $DockerStatus.Images.List.Count -gt 0) {
             foreach ($image in $DockerStatus.Images.List) {
-                Write-Output "    • $image"
+                Write-Output "    â€¢ $image"
             }
         }
     } else {
@@ -119,7 +119,7 @@ function Format-DockerStatus {
         Write-StatusLine "Volumes" "$($DockerStatus.Volumes.Count) volumes"
         if ($ShowDetails -and $DockerStatus.Volumes.List.Count -gt 0) {
             foreach ($volume in $DockerStatus.Volumes.List) {
-                Write-Output "    • $volume"
+                Write-Output "    â€¢ $volume"
             }
         }
     } else {
@@ -167,16 +167,16 @@ try {
         # Summary
         Write-StatusHeader "Summary"
         
-        $wslReady = if ($systemStatus.Summary.WSLReady) { "✅ Ready" } else { "❌ Not Ready" }
+        $wslReady = if ($systemStatus.Summary.WSLReady) { "âœ… Ready" } else { "âŒ Not Ready" }
         Write-StatusLine "WSL Environment" $wslReady
         
-        $dockerReady = if ($systemStatus.Summary.DockerReady) { "✅ Ready" } else { "❌ Not Ready" }
+        $dockerReady = if ($systemStatus.Summary.DockerReady) { "âœ… Ready" } else { "âŒ Not Ready" }
         Write-StatusLine "Docker Environment" $dockerReady
         
-        $overallStatus = if ($systemStatus.Summary.BothReady) { "✅ Both Ready for Development" } else { "⚠️ Setup Required" }
+        $overallStatus = if ($systemStatus.Summary.BothReady) { "âœ… Both Ready for Development" } else { "âš ï¸ Setup Required" }
         Write-StatusLine "Overall Status" $overallStatus
         
-        $backupStatus = if ($systemStatus.Summary.BackupExists) { "✅ Available" } else { "❌ No Backup Found" }
+        $backupStatus = if ($systemStatus.Summary.BackupExists) { "âœ… Available" } else { "âŒ No Backup Found" }
         Write-StatusLine "Docker Backup" $backupStatus
         
         Write-Output "`n$('=' * 60)"
