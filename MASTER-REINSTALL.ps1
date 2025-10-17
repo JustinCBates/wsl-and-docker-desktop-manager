@@ -179,13 +179,14 @@ switch ($Phase) {
     
     "install-wsl" {
         Write-Host "`n📋 Phase: Install WSL 2 Only" -ForegroundColor Green
-        
         $result = Invoke-ScriptPhase -ScriptName "INSTALL-WSL2-DYNAMIC.ps1" -PhaseName "WSL 2 Installation"
+        if ($result -eq "restart") {
+            exit 0
+        }
     }
     
     "install-docker" {
         Write-Host "`n📋 Phase: Install Docker Only" -ForegroundColor Green
-        
         $result = Invoke-ScriptPhase -ScriptName "INSTALL-DOCKER-DESKTOP.ps1" -PhaseName "Docker Desktop Installation"
     }
     
