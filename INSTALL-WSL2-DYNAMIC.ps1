@@ -4,15 +4,19 @@
 
 param(
     [string]$WSLInstallPath = "C:\WSL",
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification='Reserved for future disk configuration features')]
     [string]$WSLDistro = "Ubuntu-22.04",
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification='Reserved for future disk configuration features')]
     [int]$MaxDiskSizeGB = 100,
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification='Reserved for future disk configuration features')]
     [int]$InitialDiskSizeGB = 20,
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification='Reserved for future disk configuration features')]
     [switch]$UseCustomLocation = $false
 )
 
 # Check for admin privileges
 if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "âŒ This script requires Administrator privileges" -ForegroundColor Red
+    Write-Host "âŒ This script requires Administrator privileges" -ForegroundColor Red
     Write-Host "Please run PowerShell as Administrator and try again" -ForegroundColor Yellow
     exit 1
 }

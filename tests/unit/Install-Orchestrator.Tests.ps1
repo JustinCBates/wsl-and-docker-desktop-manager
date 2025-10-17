@@ -1,23 +1,23 @@
 BeforeAll {
     # Import the orchestrator
-    $orchestratorPath = Join-Path $PSScriptRoot "..\..\scripts\Install-Orchestrator.ps1"
+    $script:orchestratorPath = Join-Path $PSScriptRoot "..\..\scripts\Install-Orchestrator.ps1"
 }
 
 Describe "Install-Orchestrator" {
     Context "Parameter validation" {
         It "Should require Target parameter" {
-            { & $orchestratorPath } | Should -Throw
+            { & $script:orchestratorPath } | Should -Throw
         }
         
         It "Should accept valid Target values" {
             $validTargets = @("wsl-only", "docker-only", "both")
             foreach ($target in $validTargets) {
-                { & $orchestratorPath -Target $target -WhatIf } | Should -Not -Throw
+                { & $script:orchestratorPath -Target $target -WhatIf } | Should -Not -Throw
             }
         }
         
         It "Should reject invalid Target values" {
-            { & $orchestratorPath -Target "invalid" } | Should -Throw
+            { & $script:orchestratorPath -Target "invalid" } | Should -Throw
         }
     }
     
@@ -35,7 +35,7 @@ Describe "Install-Orchestrator" {
                 return 0
             } -Verifiable
             
-            & $orchestratorPath -Target "wsl-only" -WhatIf
+            & $script:orchestratorPath -Target "wsl-only" -WhatIf
             Should -InvokeVerifiable
         }
     }
@@ -53,7 +53,7 @@ Describe "Install-Orchestrator" {
                 return 0
             } -Verifiable
             
-            & $orchestratorPath -Target "docker-only" -WhatIf
+            & $script:orchestratorPath -Target "docker-only" -WhatIf
             Should -InvokeVerifiable
         }
     }
@@ -72,7 +72,7 @@ Describe "Install-Orchestrator" {
                 return 0
             }
             
-            & $orchestratorPath -Target "both" -WhatIf
+            & $script:orchestratorPath -Target "both" -WhatIf
             
             $callOrder[0] | Should -Match "Install-WSL.ps1"
             $callOrder[1] | Should -Match "Install-Docker.ps1"
@@ -84,7 +84,7 @@ Describe "Install-Orchestrator" {
             Mock Join-Path { return "C:\nonexistent\script.ps1" }
             Mock Test-Path { return $false }
             
-            { & $orchestratorPath -Target "wsl-only" } | Should -Throw "*not found*"
+            { & $script:orchestratorPath -Target "wsl-only" } | Should -Throw "*not found*"
         }
         
         It "Should propagate script errors" {
@@ -92,7 +92,7 @@ Describe "Install-Orchestrator" {
             Mock Test-Path { return $true }
             Mock & { throw "Installation failed" }
             
-            { & $orchestratorPath -Target "wsl-only" } | Should -Throw
+            { & $script:orchestratorPath -Target "wsl-only" } | Should -Throw
         }
     }
 }

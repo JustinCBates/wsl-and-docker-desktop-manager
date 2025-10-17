@@ -1,4 +1,4 @@
-#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.0" }
+﻿#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.0" }
 
 <#
 .SYNOPSIS
@@ -9,12 +9,12 @@
 #>
 
 param(
-    [switch]$SkipTests = $false,
-    [switch]$SkipLinting = $false,
-    [switch]$UpdateTodoList = $true,
+    [switch]$SkipTests,
+    [switch]$SkipLinting,
+    [switch]$UpdateTodoList,
     [ValidateSet("All", "Unit", "Integration")]
     [string]$TestType = "All",
-    [switch]$Detailed = $false
+    [switch]$Detailed
 )
 
 $ErrorActionPreference = "Stop"
@@ -37,7 +37,7 @@ function Write-TestSection {
     Write-Host "`n>> $Message" -ForegroundColor Yellow
 }
 
-function Get-LintingIssues {
+function Get-LintingIssue {
     Write-TestHeader "RUNNING COMPREHENSIVE LINTING"
     
     $issues = @()
@@ -109,7 +109,8 @@ function Get-LintingIssues {
     return $issues
 }
 
-function New-TodoListFromIssues {
+function New-TodoListFromIssue {
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
         [array]$Issues,
@@ -200,8 +201,10 @@ function Export-TodoListFile {
         }
     }
     
-    Set-Content -Path $todoFile -Value $content -Encoding UTF8
-    Write-Host "`n✅ Todo list exported to: $todoFile" -ForegroundColor Green
+    if ($PSCmdlet.ShouldProcess($todoFile, "Create/Update TODO.md file")) {
+        Set-Content -Path $todoFile -Value $content -Encoding UTF8
+        Write-Host "`nâœ… Todo list exported to: $todoFile" -ForegroundColor Green
+    }
 }
 
 # Main execution
@@ -227,7 +230,7 @@ try {
         
         $script:testResults = Invoke-Pester -Configuration $pesterConfig
         
-        Write-Host "`n📊 TEST SUMMARY:" -ForegroundColor Cyan
+        Write-Host "`nðŸ“Š TEST SUMMARY:" -ForegroundColor Cyan
         Write-Host "  Total: $($testResults.TotalCount)" -ForegroundColor White
         Write-Host "  Passed: $($testResults.PassedCount)" -ForegroundColor Green
         Write-Host "  Failed: $($testResults.FailedCount)" -ForegroundColor $(if($testResults.FailedCount -gt 0){"Red"}else{"Green"})
@@ -236,9 +239,9 @@ try {
     
     # Run Linting
     if (-not $SkipLinting) {
-        $script:lintingIssues = Get-LintingIssues
+        $script:lintingIssues = Get-LintingIssue
         
-        Write-Host "`n📋 LINTING SUMMARY:" -ForegroundColor Cyan
+        Write-Host "`nðŸ"‹ LINTING SUMMARY:" -ForegroundColor Cyan
         $errorCount = ($lintingIssues | Where-Object Severity -in "Error","error").Count
         $warningCount = ($lintingIssues | Where-Object Severity -in "Warning","warning").Count
         
@@ -256,7 +259,7 @@ try {
     
     # Generate Todo List
     if ($UpdateTodoList -and ($lintingIssues.Count -gt 0 -or ($testResults -and $testResults.FailedCount -gt 0))) {
-        $todos = New-TodoListFromIssues -Issues $lintingIssues -TestResults $testResults
+        $todos = New-TodoListFromIssue -Issues $lintingIssues -TestResults $testResults
         Export-TodoListFile -Todos $todos
     }
     
@@ -265,16 +268,16 @@ try {
     $hasFailedTests = $testResults -and $testResults.FailedCount -gt 0
     
     if ($hasErrors -or $hasFailedTests) {
-        Write-Host "`n❌ QUALITY CHECK FAILED" -ForegroundColor Red
+        Write-Host "`nâŒ QUALITY CHECK FAILED" -ForegroundColor Red
         exit 1
     }
     else {
-        Write-Host "`n✅ QUALITY CHECK PASSED" -ForegroundColor Green
+        Write-Host "`nâœ… QUALITY CHECK PASSED" -ForegroundColor Green
         exit 0
     }
 }
 catch {
-    Write-Host "`n❌ ERROR: $_" -ForegroundColor Red
+    Write-Host "`nâŒ ERROR: $_" -ForegroundColor Red
     Write-Host $_.ScriptStackTrace -ForegroundColor Red
     exit 1
 }
