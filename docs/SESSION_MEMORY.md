@@ -28,7 +28,7 @@ Located in: `C:\Users\justi\OneDrive\Desktop\LocalRepos\wsl-and-docker-desktop-m
 - `INSTALL-DOCKER-DESKTOP.ps1` - Docker Desktop installation
 - `UNINSTALL-WSL.ps1` - WSL removal
 - `UNINSTALL-DOCKER-DESKTOP.ps1` - Docker Desktop removal
-- `BACKUP-DOCKER-DATA.ps1` - Backup functionality
+- `BACKUP-DOCKER-DATA.ps1` - REMOVED (backup functionality removed)
 
 ## Technical Context
 - **Platform**: Windows 11, PowerShell 5.1

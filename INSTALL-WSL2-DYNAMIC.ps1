@@ -299,26 +299,26 @@ $diskCompactScript = @"
 # WSL Disk Compaction Script (Windows)
 # Run this from Windows PowerShell to compact WSL disk
 
-Write-Host "ðŸ’¾ WSL Disk Compaction Starting..." -ForegroundColor Green
+Write-Information "ðŸ’¾ WSL Disk Compaction Starting..." -Tags Info
 
 # Shutdown WSL
-Write-Host "ðŸ›‘ Shutting down WSL..." -ForegroundColor Cyan
+Write-Information "ðŸ›‘ Shutting down WSL..." -Tags Info
 wsl --shutdown
 Start-Sleep -Seconds 3
 
 # Find Ubuntu VHDX file
-Write-Host "ðŸ” Finding Ubuntu disk file..." -ForegroundColor Cyan
+Write-Information "ðŸ” Finding Ubuntu disk file..." -Tags Info
 `$vhdxPath = Get-ChildItem "`$env:LOCALAPPDATA\Packages\CanonicalGroupLimited.Ubuntu*\LocalState\ext4.vhdx" -ErrorAction SilentlyContinue | Select-Object -First 1
 
 if (`$vhdxPath) {
-    Write-Host "ðŸ“ Found: `$(`$vhdxPath.FullName)" -ForegroundColor Yellow
+    Write-Information "ðŸ“ Found: `$(`$vhdxPath.FullName)" -Tags Info
     
     # Get current size
     `$currentSize = [math]::Round(`$vhdxPath.Length / 1GB, 2)
-    Write-Host "ðŸ“Š Current size: `${currentSize}GB" -ForegroundColor White
+    Write-Information "ðŸ“Š Current size: `${currentSize}GB" -Tags Info
     
     # Compact using diskpart
-    Write-Host "ðŸ—œï¸  Compacting disk..." -ForegroundColor Cyan
+    Write-Information "ðŸ—œï¸  Compacting disk..." -Tags Action
     `$diskpartCommands = @"
 select vdisk file="`$(`$vhdxPath.FullName)"
 compact vdisk
@@ -331,12 +331,12 @@ exit
     `$newSize = [math]::Round((Get-Item `$vhdxPath.FullName).Length / 1GB, 2)
     `$savedSpace = `$currentSize - `$newSize
     
-    Write-Host "âœ… Compaction completed!" -ForegroundColor Green
-    Write-Host "ðŸ“Š New size: `${newSize}GB" -ForegroundColor White
-    Write-Host "ðŸ’¾ Space saved: `${savedSpace}GB" -ForegroundColor Green
+    Write-Information "âœ… Compaction completed!" -Tags Success
+    Write-Information "ðŸ“Š New size: `${newSize}GB" -Tags Info
+    Write-Information "ðŸ’¾ Space saved: `${savedSpace}GB" -Tags Success
 } else {
-    Write-Host "âŒ Ubuntu disk file not found" -ForegroundColor Red
-    Write-Host "ðŸ” Please check if Ubuntu is installed correctly" -ForegroundColor Yellow
+    Write-Warning "âŒ Ubuntu disk file not found"
+    Write-Information "ðŸ” Please check if Ubuntu is installed correctly" -Tags Info
 }
 "@
 
@@ -357,7 +357,7 @@ try {
     $wslTest | ForEach-Object { Write-Information "  $_" -Tags Info }
     
     # Test basic command
-    Write-Host "`nðŸ§ Testing Ubuntu..." -ForegroundColor White
+    Write-Information "`nðŸ§ Testing Ubuntu..." -Tags Info
     wsl -d Ubuntu-22.04 echo "âœ… Ubuntu is working correctly!"
     
     Write-Information "  âœ… WSL installation test passed" -Tags Success

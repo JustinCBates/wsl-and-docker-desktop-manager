@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Safety checks and verification tests
 
 ### Features
-- **BACKUP-DOCKER-DATA.ps1**: Comprehensive Docker data backup
+-- **BACKUP-DOCKER-DATA.ps1**: REMOVED - backup functionality intentionally removed from the codebase
 - **UNINSTALL-DOCKER-DESKTOP.ps1**: Clean Docker Desktop removal
 - **UNINSTALL-WSL.ps1**: Complete WSL uninstallation with backup
 - **INSTALL-WSL2-DYNAMIC.ps1**: WSL 2 installation with dynamic storage

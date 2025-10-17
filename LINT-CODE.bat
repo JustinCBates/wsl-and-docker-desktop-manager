@@ -19,7 +19,12 @@ echo.
 
 if "%1"=="" (
     echo Linting all Python files in project...
-    powershell -Command "Get-ChildItem -Path . -Recurse -Filter *.py | ForEach-Object { Write-Host '========================'; Write-Host 'Checking:' $_.Name; Write-Host '========================'; pylint $_.FullName }"
+    for /f "delims=" %%F in ('dir /b /s *.py') do (
+        echo ========================
+        echo Checking: %%~nF
+        echo ========================
+        .venv\Scripts\python -m pylint "%%~fF"
+    )
     echo.
 ) else (
     echo Linting: %1

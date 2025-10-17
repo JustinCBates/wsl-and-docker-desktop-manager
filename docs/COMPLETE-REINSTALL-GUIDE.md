@@ -39,7 +39,7 @@ This guide will help you completely uninstall and reinstall Docker Desktop and W
 
 2. **Run the backup script**
    ```powershell
-   .\BACKUP-DOCKER-DATA.ps1
+   NOTE: Backup script `BACKUP-DOCKER-DATA.ps1` has been removed from this repository. Please perform backups using your preferred tooling.
    ```
    
    **Options:**

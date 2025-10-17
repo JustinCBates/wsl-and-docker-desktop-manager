@@ -1,4 +1,4 @@
-﻿# Parameters available for command-line invocation (used by MVP and other callers)
+# Parameters available for command-line invocation (used by MVP and other callers)
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 param(
     [Parameter(Position=0)]
@@ -122,7 +122,7 @@ try {
             Write-Header "Install WSL Only"
             $args = @()
             if ($Force) { $args += "-Force" }
-            $result = Invoke-ScriptPhase -ScriptName "Install-Orchestrator.ps1" -PhaseName "WSL Installation" -Arguments (@("-Target", "wsl-only") + $args)
+            $result = Invoke-ScriptPhase -ScriptName "Install-Orchestrator.ps1" -PhaseName "WSL Installation" -Arguments ((@("-Target", "wsl-only")) + $args)
             if ($result -eq "restart") { exit 0 }
         }
         
@@ -130,14 +130,14 @@ try {
             Write-Header "Install Docker Only"
             $args = @()
             if ($Force) { $args += "-Force" }
-            Invoke-ScriptPhase -ScriptName "Install-Orchestrator.ps1" -PhaseName "Docker Installation" -Arguments (@("-Target", "docker-only") + $args)
+            Invoke-ScriptPhase -ScriptName "Install-Orchestrator.ps1" -PhaseName "Docker Installation" -Arguments ((@()) + $args)
         }
         
         "install-both" {
             Write-Header "Install WSL and Docker"
             $args = @()
             if ($Force) { $args += "-Force" }
-            $result = Invoke-ScriptPhase -ScriptName "Install-Orchestrator.ps1" -PhaseName "WSL and Docker Installation" -Arguments (@("-Target", "both") + $args)
+            $result = Invoke-ScriptPhase -ScriptName "Install-Orchestrator.ps1" -PhaseName "WSL and Docker Installation" -Arguments ((@("-Target", "both")) + $args)
             if ($result -eq "restart") { exit 0 }
         }
         

@@ -4,10 +4,10 @@ param()
 $ErrorActionPreference = "Stop"
 
 function Test-DockerInstalled {
-    """
+    <#
     Check if Docker is installed
     Returns: $true if Docker executable is found and responds, $false otherwise
-    """
+    #>
     try {
         $dockerPath = Get-Command docker.exe -ErrorAction SilentlyContinue
         if ($dockerPath) {
@@ -22,13 +22,14 @@ function Test-DockerInstalled {
 }
 
 function Test-DockerRunning {
-    """
+    <#
     Check if Docker daemon is running
     Returns: $true if Docker daemon is responsive, $false otherwise
-    """
+    #>
     try {
-        & docker info 2>$null | Out-Null
-        return $LASTEXITCODE -eq 0
+        $output = & docker info 2>$null
+        if (-not $output) { return $false }
+        return $true
     }
     catch {
         return $false
@@ -36,10 +37,10 @@ function Test-DockerRunning {
 }
 
 function Test-DockerDesktopInstalled {
-    """
+    <#
     Check if Docker Desktop is installed
     Returns: $true if Docker Desktop executable is found, $false otherwise
-    """
+    #>
     try {
         $dockerDesktopPaths = @(
             "${env:ProgramFiles}\Docker\Docker\Docker Desktop.exe",
@@ -55,10 +56,10 @@ function Test-DockerDesktopInstalled {
 }
 
 function Test-DockerWorking {
-    """
+    <#
     Test if Docker is fully functional by running a simple container
     Returns: $true if Docker can run containers successfully, $false otherwise
-    """
+    #>
     try {
         & docker run --rm hello-world 2>$null | Out-Null
         return $LASTEXITCODE -eq 0
@@ -69,10 +70,10 @@ function Test-DockerWorking {
 }
 
 function Get-DockerVersion {
-    """
+    <#
     Get Docker version information
     Returns: Hashtable with version details
-    """
+    #>
     try {
         if (Test-DockerInstalled) {
             $versionOutput = & docker --version 2>$null
@@ -97,10 +98,10 @@ function Get-DockerVersion {
 }
 
 function Get-DockerContainer {
-    """
+    <#
     Get information about Docker containers
     Returns: Hashtable with container counts
-    """
+    #>
     if (-not (Test-DockerRunning)) {
         return @{
             Available = $false
@@ -137,10 +138,10 @@ function Get-DockerContainer {
 }
 
 function Get-DockerImage {
-    """
+    <#
     Get information about Docker images
     Returns: Hashtable with image information
-    """
+    #>
     if (-not (Test-DockerRunning)) {
         return @{
             Available = $false
@@ -170,10 +171,10 @@ function Get-DockerImage {
 }
 
 function Get-DockerVolume {
-    """
+    <#
     Get information about Docker volumes
     Returns: Hashtable with volume information
-    """
+    #>
     if (-not (Test-DockerRunning)) {
         return @{
             Available = $false
@@ -202,10 +203,10 @@ function Get-DockerVolume {
 }
 
 function Get-DockerStatus {
-    """
+    <#
     Get comprehensive Docker status information
     Returns: Hashtable with complete Docker status
-    """
+    #>
     $status = @{
         Installed = Test-DockerInstalled
         DesktopInstalled = Test-DockerDesktopInstalled

@@ -24,32 +24,49 @@ set LINT_ERRORS=0
 
 echo [1/5] Linting Python files (.py)...
 echo ========================================
-powershell -Command "Get-ChildItem -Path . -Recurse -Filter *.py | ForEach-Object { Write-Host 'Checking:' $_.Name; pylint $_.FullName; if ($LASTEXITCODE -ne 0) { exit 1 } }"
-if errorlevel 1 set LINT_ERRORS=1
+for /f "delims=" %%F in ('dir /b /s *.py') do (
+    echo Checking: %%~nF
+    .venv\Scripts\python -m pylint "%%~fF"
+    if errorlevel 1 set LINT_ERRORS=1
+)
 echo.
 
 echo [2/5] Linting PowerShell files (.ps1)...
 echo ========================================
-powershell -Command "Get-ChildItem -Path . -Recurse -Filter *.ps1 | ForEach-Object { Write-Host 'Checking:' $_.Name; try { Invoke-ScriptAnalyzer -Path $_.FullName -Severity Warning,Error } catch { Write-Host 'Error analyzing' $_.Name -ForegroundColor Red; exit 1 } }"
+powershell -NoProfile -ExecutionPolicy Bypass -File "tools\run_pssa.ps1" -Path "%CD%"
 if errorlevel 1 set LINT_ERRORS=1
 echo.
 
 echo [3/5] Checking Batch files (.bat)...
 echo ========================================
-powershell -Command "Get-ChildItem -Path . -Recurse -Filter *.bat | ForEach-Object { Write-Host 'Checking syntax:' $_.Name; try { Get-Content $_.FullName -ErrorAction Stop | Out-Null; Write-Host 'OK:' $_.Name } catch { Write-Host 'Syntax error in' $_.Name -ForegroundColor Red; exit 1 } }"
-if errorlevel 1 set LINT_ERRORS=1
+for /f "delims=" %%B in ('dir /b /s *.bat') do (
+    echo Checking: %%~nB
+    powershell -NoProfile -Command "Get-Content -LiteralPath '%%~fB' -ErrorAction Stop | Out-Null"
+    if errorlevel 1 set LINT_ERRORS=1
+)
 echo.
 
 echo [4/5] Linting YAML files (.yml, .yaml)...
 echo ========================================
-powershell -Command "Get-ChildItem -Path . -Recurse -Include *.yml,*.yaml | ForEach-Object { Write-Host 'Checking:' $_.Name; yamllint $_.FullName; if ($LASTEXITCODE -ne 0) { exit 1 } }"
-if errorlevel 1 set LINT_ERRORS=1
+for /f "delims=" %%Y in ('dir /b /s *.yml *.yaml 2^>nul') do (
+    echo Checking: %%~nY
+    yamllint "%%~fY"
+    if errorlevel 1 set LINT_ERRORS=1
+)
 echo.
 
 echo [5/5] Checking JSON files (.json)...
 echo ========================================
-powershell -Command "Get-ChildItem -Path . -Recurse -Filter *.json | ForEach-Object { Write-Host 'Checking:' $_.Name; python -m json.tool $_.FullName | Out-Null; if ($LASTEXITCODE -ne 0) { Write-Host 'ERROR: Invalid JSON in' $_.Name -ForegroundColor Red; exit 1 } else { Write-Host 'OK:' $_.Name } }"
-if errorlevel 1 set LINT_ERRORS=1
+for /f "delims=" %%J in ('dir /b /s *.json') do (
+    echo Checking: %%~nJ
+    .venv\Scripts\python -m json.tool "%%~fJ" >nul
+    if errorlevel 1 (
+        echo ERROR: Invalid JSON in %%~nJ
+        set LINT_ERRORS=1
+    ) else (
+        echo OK: %%~nJ
+    )
+)
 echo.
 
 echo ========================================

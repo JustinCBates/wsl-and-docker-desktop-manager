@@ -47,11 +47,9 @@ function Invoke-UninstallScript {
 try {
     Write-Phase "Uninstallation Orchestrator Started - Target: $Target"
     
-    # Backup first if not skipped
+    # Backup first if not skipped - REMOVED
     if (-not $SkipBackup -and ($Target -eq "docker-only" -or $Target -eq "both")) {
-        $backupArgs = @("-BackupPath", $BackupPath)
-        if ($Force) { $backupArgs += "-Force" }
-        Invoke-UninstallScript -ScriptPath "backup\Backup-Data.ps1" -PhaseName "Data Backup" -Arguments $backupArgs
+        Write-Output "Data backup step removed; please ensure you have external backups if needed."
     }
     
     switch ($Target) {
