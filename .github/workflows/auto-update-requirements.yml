@@ -1,0 +1,53 @@
+name: Auto-update pinned requirements
+
+on:
+  pull_request:
+    paths:
+      - 'pyproject.toml'
+    types: [opened, synchronize]
+
+jobs:
+  update-requirements:
+    name: Generate & propose updated pinned requirements
+    runs-on: ubuntu-latest
+    if: github.repository == github.event.pull_request.head.repo.full_name
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Generate requirements.in from pyproject
+        run: |
+          python scripts/sync_reqs_from_pyproject.py --write-txt
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dependencies/requirements*.txt || echo "no changes"
+          if git diff --cached --quiet; then
+            echo "No pinned changes to propose"
+            exit 0
+          fi
+          git commit -m "chore(deps): regenerate pinned requirements from pyproject.toml"
+
+      - name: Push to branch
+        run: |
+          git push origin HEAD:refs/heads/auto/update-requirements-${{ github.event.pull_request.number }}
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: chore(deps): regenerate pinned requirements from pyproject.toml
+          title: chore(deps): regenerate pinned requirements from pyproject.toml
+          body: |-
+            This PR was created automatically by CI to update pinned requirements after changes to `pyproject.toml`.
+          base: ${{ github.event.pull_request.base.ref }}
+          head: auto/update-requirements-${{ github.event.pull_request.number }}
