@@ -2,12 +2,17 @@ name: Block new root directories
 
 on:
   pull_request:
+    branches: [ main ]
   push:
+    branches: [ main ]
 
 jobs:
   block-root-additions:
     name: Prevent new top-level directories
     runs-on: ubuntu-latest
+    if: >-
+      startsWith(github.ref, 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
