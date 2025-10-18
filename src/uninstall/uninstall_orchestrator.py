@@ -77,3 +77,25 @@ def uninstall_sequence(yes: bool = False, dry_run: bool = True, progress_cb=None
     results.append(res)
 
     return results
+
+
+def main(dry_run: bool = True, yes: bool = False, log_path: str = None, targets=None, progress_cb=None, interactive: bool = False):
+    """Top-level entrypoint for the uninstall orchestrator.
+
+    If interactive=True and `questionary` is available, prompt the user for
+    dry-run/yes options. Otherwise use provided args. Returns the list of
+    StepResult objects produced by uninstall_sequence.
+    """
+    if interactive:
+        try:
+            import questionary  # type: ignore
+            # ask dry-run and yes
+            dr = questionary.confirm("Dry-run (no changes)?", default=True).ask()
+            yn = questionary.confirm("Run with -Yes (allow destructive actions)?", default=False).ask()
+            dry_run = bool(dr)
+            yes = bool(yn)
+        except Exception:
+            # fallback to provided args
+            pass
+
+    return uninstall_sequence(yes=yes, dry_run=dry_run, progress_cb=progress_cb)
