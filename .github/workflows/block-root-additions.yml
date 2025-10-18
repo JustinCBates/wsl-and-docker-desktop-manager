@@ -2,7 +2,9 @@ name: Block new root directories
 
 on:
   pull_request:
+    branches: [ main ]
   push:
+    branches: [ main ]
 
 jobs:
   block-root-additions:
