@@ -10,6 +10,18 @@ import sys
 from pathlib import Path
 
 import questionary
+import queue
+
+# Emoji/icon helper for menu presentation
+try:
+    from src.ui.icons import get_icon, list_palette
+except Exception:
+    # Fail gracefully if UI icons aren't available; provide fallbacks
+    def get_icon(name: str) -> str:  # type: ignore
+        return ""
+
+    def list_palette() -> list:  # type: ignore
+        return []
 
 
 class WSLDockerManager:
@@ -161,7 +173,11 @@ class WSLDockerManager:
             print("Installation cancelled.")
             return
 
-        self.run_powershell_script("install-both", "Fresh installation in progress...", force=True)
+        # Prefer the UI-driven orchestrator (non-invasive). Fall back to legacy script if unavailable.
+        try:
+            self._run_flow_and_show_events('install', {'dry_run': False, 'yes': True})
+        except Exception:
+            self.run_powershell_script("install-both", "Fresh installation in progress...", force=True)
 
     def system_reset(self):
         """Reset existing WSL and Docker Desktop installation."""
@@ -182,8 +198,13 @@ class WSLDockerManager:
         backup_confirm = questionary.confirm("Do you want to backup Docker data first?").ask()
         skip_backup = not backup_confirm
 
-        self.run_powershell_script("complete-reinstall", "System reset in progress...", 
-                                 skip_backup=skip_backup, force=True)
+        try:
+            # run uninstall orchestrator (perform actions)
+            self._run_flow_and_show_events('uninstall', {'dry_run': False, 'yes': True})
+        except Exception:
+            # fallback to legacy script
+            self.run_powershell_script("complete-reinstall", "System reset in progress...", 
+                                     skip_backup=skip_backup, force=True)
 
     def install_wsl_only(self):
         """Install WSL only."""
@@ -198,7 +219,10 @@ class WSLDockerManager:
             print("WSL installation cancelled.")
             return
 
-        self.run_powershell_script("install-wsl", "WSL installation in progress...")
+        try:
+            self._run_flow_and_show_events('install', {'dry_run': False, 'targets': ['wsl']})
+        except Exception:
+            self.run_powershell_script("install-wsl", "WSL installation in progress...")
 
     def install_docker_only(self):
         """Install Docker Desktop only."""
@@ -213,7 +237,10 @@ class WSLDockerManager:
             print("Docker installation cancelled.")
             return
 
-        self.run_powershell_script("install-docker", "Docker installation in progress...")
+        try:
+            self._run_flow_and_show_events('install', {'dry_run': False, 'targets': ['docker']})
+        except Exception:
+            self.run_powershell_script("install-docker", "Docker installation in progress...")
 
     def backup_docker_data(self):
         """Backup Docker data."""
@@ -235,8 +262,11 @@ class WSLDockerManager:
             print("Backup cancelled.")
             return
 
-        self.run_powershell_script("backup", "Backing up Docker data...", 
-                                 backup_path=backup_path, force=True)
+        try:
+            self._run_flow_and_show_events('backup', {'dry_run': False, 'log_path': backup_path})
+        except Exception:
+            self.run_powershell_script("backup", "Backing up Docker data...", 
+                                     backup_path=backup_path, force=True)
 
     def restore_docker_data(self):
         """Restore Docker data from backup."""
@@ -253,34 +283,39 @@ class WSLDockerManager:
             print("Restore cancelled.")
             return
 
-        confirm = questionary.confirm(f"Restore Docker data from {backup_path}?").ask()
+        confirm = questionary.confirm(f"Restore Docker data from {backup_path}?" ).ask()
         if not confirm:
             print("Restore cancelled.")
             return
 
-        self.run_powershell_script("restore", "Restoring Docker data...", 
-                                 backup_path=backup_path, force=True)
+        try:
+            self._run_flow_and_show_events('restore', {'dry_run': False, 'log_path': backup_path})
+        except Exception:
+            self.run_powershell_script("restore", "Restoring Docker data...", 
+                                     backup_path=backup_path, force=True)
 
     def show_main_menu(self):
         """Display and handle the main menu."""
         while True:
             print("\n" + "=" * 60)
-            print("🐳 WSL & Docker Desktop Manager - MVP")
+            # use centralized icon palette for the header
+            header_icon = get_icon('whale')
+            print(f"{header_icon} WSL & Docker Desktop Manager - MVP")
             print("=" * 60)
 
             try:
+                # decorate choices with icons where available
+                choices = [
+                    f"{get_icon('install')} Install",
+                    f"{get_icon('uninstall')} Uninstall",
+                    f"{get_icon('status')} Check Status",
+                    f"{get_icon('backup')} Backup",
+                    f"{get_icon('exit')} ❌ Exit",
+                ]
+
                 choice = questionary.select(
                     "What would you like to do?",
-                    choices=[
-                        "🚀 Fresh Installation (WSL + Docker)",
-                        "� Install WSL Only", 
-                        "🐳 Install Docker Only",
-                        "�🔄 System Reset (Complete Reinstall)",
-                        "💾 Backup Docker Data",
-                        "📁 Restore Docker Data",
-                        "🔍 Status Check",
-                        "❌ Exit"
-                    ]
+                    choices=choices,
                 ).ask()
             except KeyboardInterrupt:
                 # Handle Ctrl+C gracefully
@@ -292,24 +327,126 @@ class WSLDockerManager:
                 print("👋 Goodbye!")
                 return
 
-            if choice == "❌ Exit":
+            # Normalize by checking suffixes to keep compatibility with icon prefixes
+            if choice is not None and choice.strip().endswith("❌ Exit"):
                 print("👋 Goodbye!")
                 return
 
-            if choice == "🚀 Fresh Installation (WSL + Docker)":
-                self.fresh_installation()
-            elif choice == "🔧 Install WSL Only":
-                self.install_wsl_only()
-            elif choice == "🐳 Install Docker Only":
-                self.install_docker_only()
-            elif choice == "🔄 System Reset (Complete Reinstall)":
-                self.system_reset()
-            elif choice == "💾 Backup Docker Data":
-                self.backup_docker_data()
-            elif choice == "📁 Restore Docker Data":
-                self.restore_docker_data()
-            elif choice == "🔍 Status Check":
-                self.show_system_status()
+            if choice is not None and choice.strip().endswith("Install"):
+                # Hand off to the install orchestrator to drive the next steps
+                try:
+                    mod = __import__('src.install.install_orchestrator', fromlist=['main'])
+                    if hasattr(mod, 'main'):
+                        res = mod.main(interactive=True)
+                        # print results if any
+                        if res is None:
+                            print("Install orchestrator completed.")
+                        else:
+                            results = res if isinstance(res, list) else [res]
+                            for r in results:
+                                try:
+                                    d = r.to_dict()
+                                    print(f"- {d.get('name')} : {d.get('status')} - {d.get('message')}")
+                                except Exception:
+                                    print(repr(r))
+                    else:
+                        print("Install orchestrator entrypoint not found")
+                except Exception:
+                    # fallback to legacy full install script
+                    self.fresh_installation()
+            elif choice is not None and choice.strip().endswith("Uninstall"):
+                try:
+                    mod = __import__('src.uninstall.uninstall_orchestrator', fromlist=['main'])
+                    if hasattr(mod, 'main'):
+                        res = mod.main(interactive=True)
+                        if res is None:
+                            print("Uninstall orchestrator completed.")
+                        else:
+                            results = res if isinstance(res, list) else [res]
+                            for r in results:
+                                try:
+                                    d = r.to_dict()
+                                    print(f"- {d.get('name')} : {d.get('status')} - {d.get('message')}")
+                                except Exception:
+                                    print(repr(r))
+                    else:
+                        print("Uninstall orchestrator entrypoint not found")
+                except Exception:
+                    # fallback to legacy system reset behavior
+                    self.system_reset()
+            elif choice is not None and choice.strip().endswith("Check Status"):
+                # status is read-only; delegate to existing status check
+                try:
+                    # prefer adapter/flow if available
+                    self._run_flow_and_show_events('status', {'dry_run': True})
+                except Exception:
+                    self.show_system_status()
+            elif choice is not None and choice.strip().endswith("Backup"):
+                # delegate to backup orchestrator or fallback
+                try:
+                    # ask for path like before
+                    backup_path = questionary.text("Backup path (default: C:\\DockerBackup):", default="C:\\DockerBackup").ask()
+                    if not backup_path:
+                        print("Backup cancelled.")
+                    else:
+                        confirm = questionary.confirm(f"Backup Docker data to {backup_path}?").ask()
+                        if not confirm:
+                            print("Backup cancelled.")
+                        else:
+                            mod = __import__('src.backup.backup_orchestrator', fromlist=['backup_sequence'])
+                            if hasattr(mod, 'backup_sequence'):
+                                seq = mod.backup_sequence(dry_run=False)
+                                for r in seq:
+                                    try:
+                                        d = r.to_dict()
+                                        print(f"- {d.get('name')} : {d.get('status')} - {d.get('message')}")
+                                    except Exception:
+                                        print(repr(r))
+                            else:
+                                # fallback to script
+                                self.run_powershell_script("backup", "Backing up Docker data...", backup_path=backup_path, force=True)
+                except Exception:
+                    print("Backup failed: falling back to legacy script")
+
+    def _run_flow_and_show_events(self, flow_name: str, options: dict):
+        """Run a named UI flow in background and print events from its queue.
+
+        Uses src.ui.threaded_runner.run_flow_in_thread if available. This is a
+        *best-effort* integration: any failure falls back to legacy behavior.
+        """
+        try:
+            # lazy import to avoid hard dependency when UI code isn't present
+            tr = __import__('src.ui.threaded_runner', fromlist=['run_flow_in_thread'])
+            run_flow = getattr(tr, 'run_flow_in_thread')
+        except Exception:
+            raise
+
+        q = queue.Queue()
+        th = run_flow(flow_name, options, q)
+
+        # Drain the queue until we see a run-end or error event, printing events.
+        while True:
+            try:
+                ev_type, ev = q.get(timeout=0.1)
+            except Exception:
+                # thread may still be running; check if it's alive
+                if not th.is_alive():
+                    break
+                continue
+
+            # simple textual rendering of events
+            if ev_type == 'run-start':
+                print(f"▶️  Flow started: {ev.get('flow')}")
+            elif ev_type == 'step-start':
+                print(f"  → Step start: {ev.get('step_id') or ev.get('name')}")
+            elif ev_type == 'step-end':
+                print(f"  ← Step end: {ev.get('step_id') or ev.get('name')} status={ev.get('status')}")
+            elif ev_type == 'run-end':
+                print(f"✅ Flow finished: {ev.get('flow')} - results: {len(ev.get('results', []))}")
+                break
+            elif ev_type == 'error':
+                print(f"❌ Flow error: {ev.get('error')}")
+                break
 
             # Only pause if not exiting
             try:
