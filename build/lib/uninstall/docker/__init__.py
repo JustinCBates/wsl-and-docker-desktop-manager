@@ -1,1 +1,0 @@
-"""Uninstall docker package."""
