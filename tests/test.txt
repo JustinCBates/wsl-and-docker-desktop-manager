@@ -1,0 +1,3 @@
+"""
+Placeholder empty file used to validate write permissions after ACL operations.
+"""
