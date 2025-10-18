@@ -58,10 +58,10 @@ def uninstall_sequence(yes: bool = False, dry_run: bool = True, progress_cb=None
     else:
         # call elevated PowerShell uninstall script (mock placeholder)
         script = os.path.join(repo_root, 'tools', 'protect', 'uninstall_docker.ps1')
-    _emit({"step_id": "uninstall_docker", "name": "uninstall_docker"}, "step-start")
-    res = runner.invoke("uninstall_docker", lambda: _run_elevated_script(script), yes_required=True, yes=yes)
-    _emit({"step_id": "uninstall_docker", "status": getattr(res, 'status', 'Unknown')}, "step-end")
-    results.append(res)
+        _emit({"step_id": "uninstall_docker", "name": "uninstall_docker"}, "step-start")
+        res = runner.invoke("uninstall_docker", lambda: _run_elevated_script(script), yes_required=True, yes=yes)
+        _emit({"step_id": "uninstall_docker", "status": getattr(res, 'status', 'Unknown')}, "step-end")
+        results.append(res)
 
     # unregister_wsl: requires explicit yes
     if dry_run:
@@ -71,10 +71,10 @@ def uninstall_sequence(yes: bool = False, dry_run: bool = True, progress_cb=None
         results.append(res)
     else:
         script = os.path.join(repo_root, 'tools', 'protect', 'unregister_wsl.ps1')
-    _emit({"step_id": "unregister_wsl", "name": "unregister_wsl"}, "step-start")
-    res = runner.invoke("unregister_wsl", lambda: _run_elevated_script(script), yes_required=True, yes=yes)
-    _emit({"step_id": "unregister_wsl", "status": getattr(res, 'status', 'Unknown')}, "step-end")
-    results.append(res)
+        _emit({"step_id": "unregister_wsl", "name": "unregister_wsl"}, "step-start")
+        res = runner.invoke("unregister_wsl", lambda: _run_elevated_script(script), yes_required=True, yes=yes)
+        _emit({"step_id": "unregister_wsl", "status": getattr(res, 'status', 'Unknown')}, "step-end")
+        results.append(res)
 
     return results
 
