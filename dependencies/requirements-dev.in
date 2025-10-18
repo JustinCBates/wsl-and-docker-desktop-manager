@@ -1,0 +1,4 @@
+ruff
+pylint==4.0.1
+yamllint==1.37.1
+pytest
