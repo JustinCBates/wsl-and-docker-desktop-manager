@@ -47,6 +47,47 @@ Recommended workflow mapping (summary)
 - Release PR (build → main)
   - `ci-tests-on-pr.yml` runs, full CI should have been run on `build`, and blockers (`block-root-additions`, docs enforcement) run for `main`.
 
+PR behavior: develop → build
+-----------------------------
+- Intended use: PRs from `develop` to `build` are integration gates. They validate that the cumulative changes on `develop` are ready to be promoted for a release candidate.
+- Expected workflows to run:
+  - `ci-tests-on-pr.yml` — lightweight PR checks (pytest quick run).
+  - `ci-build-and-publish-package.yml` — full CI (pinned deps check, lint, tests, build). This workflow is configured to run for PRs targeting `build`.
+- Blockers that should NOT run for this PR path:
+  - `block-root-additions.yml` and `ci-docs-enforce.yml` are intended for `main` and should not stop develop→build PRs.
+
+Example: top-level snippet for `ci-build-and-publish-package.yml` (already in repo):
+
+```yaml
+on:
+  pull_request:
+    branches: [ build ]
+  push:
+    branches: [ build ]
+```
+
+PR behavior: feature/* → develop
+--------------------------------
+- Intended use: day-to-day development. Feature branches target `develop` for iterative work and review.
+- Expected workflows to run:
+  - `ci-tests-on-pr.yml` — lightweight tests only. It is fast and covers unit/smoke tests.
+  - Path-based automations (e.g., auto-update requirements) may run if they match; these are intentionally limited by path.
+- Blockers that should NOT run for this PR path:
+  - Any enforcement workflow that gates merges into `main` (e.g., docs enforcement, root additions) should not run when the PR base is `develop`. Job-level guards prevent them from executing.
+
+Example: top-of-file for `ci-tests-on-pr.yml` (already in repo):
+
+```yaml
+on:
+  pull_request:
+    branches: [ develop, build, main ]
+```
+
+Operational checklist for reviewers
+- For `feature/* -> develop` PRs: ensure tests pass; docs in `docs/development/` are OK here.
+- For `develop -> build` PRs: ensure full CI passes; keep docs in `docs/development/` unless they must be promoted to `main`.
+- For `build -> main` PRs: ensure blockers pass (no development-only docs, no unexpected root additions); if a blocker flags something that must land on `main`, create a separate PR that moves files appropriately.
+
 Notes and operational guidance
 - If you need to change which branches trigger which workflows, update the `on:` block at the top of the corresponding workflow and keep job-level guards for enforcement workflows.
 - For path-specific automations (e.g., update pinned requirements when `pyproject.toml` changes), path filters are acceptable but consider whether they should be limited to `develop` or `main`.
