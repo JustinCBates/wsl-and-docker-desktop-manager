@@ -16,8 +16,8 @@ from pathlib import Path
 parser = argparse.ArgumentParser()
 parser.add_argument("--write-txt", action="store_true", help="Also run pip-compile to generate pinned requirements.txt")
 parser.add_argument("--pyproject", default="pyproject.toml")
-parser.add_argument("--out-in", default="requirements.in")
-parser.add_argument("--out-dev-in", default="requirements-dev.in")
+parser.add_argument("--out-in", default="dependencies/requirements.in")
+parser.add_argument("--out-dev-in", default="dependencies/requirements-dev.in")
 args = parser.parse_args()
 
 pyproject_path = Path(args.pyproject)

@@ -9,15 +9,15 @@ Key tools
 
 Typical day-to-day workflow
 
-1. Edit `requirements.in` to add or remove top-level runtime dependencies (or edit `pyproject.toml` for project metadata/runtime deps). Note: in this repository the `requirements.in` and `requirements-dev.in` files are generated from `pyproject.toml` by `scripts/sync_reqs_from_pyproject.py` and are ignored in Git. Developers should normally edit `pyproject.toml` (the canonical source) and run the sync script locally when needed.
+1. Edit `requirements.in` to add or remove top-level runtime dependencies (or edit `pyproject.toml` for project metadata/runtime deps). Note: in this repository the generated `requirements.in` and `requirements-dev.in` files are produced into `dependencies/` by `scripts/sync_reqs_from_pyproject.py` and are ignored in Git. Developers should normally edit `pyproject.toml` (the canonical source) and run the sync script locally when needed.
 2. Run pip-compile locally to regenerate a pinned `requirements.txt`:
 
 ```powershell
 python -m pip install --upgrade pip pip-tools
-python -m piptools compile --output-file=requirements.txt requirements.in
+python -m piptools compile --output-file=dependencies/requirements.txt dependencies/requirements.in
 ```
 
-3. Commit the regenerated `requirements.txt` (pinned) to the branch. Do NOT commit the generated `requirements.in` files — they are ignored and will be created by CI from `pyproject.toml`.
+3. Commit the regenerated `dependencies/requirements.txt` (pinned) to the branch. Do NOT commit the generated `dependencies/requirements.in` files — they are ignored and will be created by CI from `pyproject.toml`.
 
 CI enforcement
 - The repository CI runs a pinned-check job which executes:
