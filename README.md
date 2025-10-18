@@ -74,4 +74,29 @@ Install:
 ```powershell
 python -m pip install -r requirements.txt         # production
 python -m pip install -r requirements-dev.txt     # development (linters, test tools)
+
+Quick dev workflow (recommended)
+-------------------------------
+
+There's a small helper PowerShell script at `run_with_venv.ps1` that creates/activates a `.venv`,
+installs runtime requirements and (optionally) development requirements, then runs the interactive
+manager. The `-Dev` flag installs development dependencies listed in `dependencies/requirements-dev.txt`.
+
+Examples:
+
+```powershell
+# Create/activate venv, install runtime deps and dev deps, then run manager
+.\run_with_venv.ps1 -Dev
+
+# Same but silence pip output
+.\run_with_venv.ps1 -Dev -Quiet
+
+# Create/activate venv but skip any pip installs
+.\run_with_venv.ps1 -NoInstall
+```
+
+Notes:
+- The `-Dev` flag will install tools like `pytest`, `pylint`, `ruff`, and `yamllint` into the venv.
+- If you prefer to manage dev deps manually, add or remove packages in `dependencies/requirements-dev.in`
+	and regenerate the pinned file with `pip-compile`.
 ```
