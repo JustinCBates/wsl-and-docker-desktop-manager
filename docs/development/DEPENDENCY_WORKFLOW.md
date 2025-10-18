@@ -1,3 +1,31 @@
+Developers: edit `pyproject.toml` for top-level deps and then either use the single-command helpers below or run the two-step commands manually.
+
+Quick single-command helpers
+
+- PowerShell (Windows):
+
+```powershell
+./scripts/update-requirements.ps1
+```
+
+- Makefile (Unix-like):
+
+```sh
+make update-requirements
+```
+
+Manual two-step commands
+
+```powershell
+python scripts/sync_reqs_from_pyproject.py
+python -m pip install --upgrade pip pip-tools
+python -m piptools compile --output-file=dependencies/requirements.txt dependencies/requirements.in
+```
+
+This document describes the dependency management workflow used during development. It is intended for contributors working on development branches and should not be merged to `main` if it contains work-in-progress guidance.
+
+Key tools
+...
 # Dependency workflow (development)
 
 This document describes the dependency management workflow used during development. It is intended for contributors working on development branches and should not be merged to `main` if it contains work-in-progress guidance.
