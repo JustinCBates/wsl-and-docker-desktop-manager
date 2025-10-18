@@ -38,6 +38,23 @@ jobs:
 
 This ensures the job executes only when the workflow is actually targeting `main`.
 
+Root-level additions policy (override allowed)
+------------------------------------------------
+- The repository will block PRs that introduce new unexpected top-level directories (for example, adding a new top-level folder `foo/`) by default on all PRs.
+- Override mechanism for PRs:
+  - Add label `allow-root-additions` or `allow-root` to the PR, OR
+  - Include the token `ALLOW_ROOT_ADDITIONS` (case-insensitive) in the PR body.
+  - Note: pushes directly to `main` are blocked and do NOT permit overrides.
+
+Development docs exclusion for build→main
+----------------------------------------
+- Files under `docs/development/` are considered development-only documentation. They should NOT be merged into `main`.
+- For PRs from `build` to `main`, changes under `docs/development/` are excluded from enforcement — i.e., the PR will not be allowed to move `docs/development/` into `main`. If something in `docs/development/` truly needs to reach `main`, move it to `docs/production/` or open a separate PR that authors the change for `main`.
+
+Main as pip-install source
+---------------------------
+- The `main` branch is the canonical source for published package artifacts and should be the branch referenced by external consumers who pip install from a GitHub-hosted wheel or source URL. In other words, the `main` branch should be the point of the URL consumers use when installing directly from repository artifacts.
+
 Recommended workflow mapping (summary)
 - Feature PR (feature/* → develop)
   - `ci-tests-on-pr.yml` runs lightweight tests only.
