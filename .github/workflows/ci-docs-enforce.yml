@@ -1,0 +1,23 @@
+name: Docs enforcement
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main ]
+
+jobs:
+  block-development-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for docs/development files
+        run: |
+          set -e
+          if git diff --name-only origin/main...HEAD | grep -E "^docs/development/"; then
+            echo "Pull request includes files under docs/development/. These should not be merged into main." >&2
+            exit 1
+          else
+            echo "No development docs detected in PR."
+          fi
