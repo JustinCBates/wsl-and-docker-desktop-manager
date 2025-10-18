@@ -7,7 +7,7 @@ if src_root not in sys.path:
     sys.path.insert(0, src_root)
 
 from step_result import StepResult
-from src.status.get_system_status import get_system_status
+from src.status.status_orchestrator import get_system_status
 from src.status.wsl.get_wsl_status import get_wsl_status
 from src.status.docker.get_docker_status import get_docker_status
 from src.uninstall.wsl.uninstall_wsl import unregister_wsl

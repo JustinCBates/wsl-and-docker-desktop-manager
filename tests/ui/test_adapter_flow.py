@@ -10,7 +10,7 @@ def test_adapter_calls(monkeypatch):
             status = 'Success'
         return R()
 
-    monkeypatch.setitem(__import__('sys').modules, 'src.status.get_system_status', type('M', (), {'main': staticmethod(fake_main)}))
+    monkeypatch.setitem(__import__('sys').modules, 'src.status.status_orchestrator', type('M', (), {'main': staticmethod(fake_main)}))
 
     res = adapter.run_flow('status', dry_run=True)
     assert isinstance(res, list)

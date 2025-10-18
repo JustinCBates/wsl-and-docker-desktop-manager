@@ -9,9 +9,9 @@ def _module_for_flow(flow_name: str) -> str:
     mapping = {
         "install": "src.install.install_orchestrator",
         "uninstall": "src.uninstall.uninstall_orchestrator",
-        "status": "src.status.get_system_status",
+        "status": "src.status.status_orchestrator",
     }
-    return mapping.get(flow_name, "src.status.get_system_status")
+    return mapping.get(flow_name, "src.status.status_orchestrator")
 
 
 def _call_module(module_path: str, dry_run: bool, yes: bool, log_path: Optional[str], targets: Optional[List[str]], progress_cb=None):

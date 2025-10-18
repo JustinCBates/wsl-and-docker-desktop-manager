@@ -23,7 +23,7 @@ class TestUninstallOrchestrator(unittest.TestCase):
 
 class TestStatusSmoke(unittest.TestCase):
     def test_status_functions_dry_run(self):
-        m1 = importlib.import_module('status.get_system_status')
+        m1 = importlib.import_module('status.status_orchestrator')
         r1 = m1.get_system_status(dry_run=True)
         self.assertEqual(r1.status, 'Skipped')
 

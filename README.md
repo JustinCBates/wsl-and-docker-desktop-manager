@@ -17,7 +17,7 @@ Importing in code (during development):
 # When running from the repository root, import the package modules directly:
 from src.install import install_orchestrator
 from src.uninstall import uninstall_orchestrator
-from src.status import get_system_status
+from src.status.status_orchestrator import get_system_status
 ```
 
 Install from a GitHub Release (token-free)
