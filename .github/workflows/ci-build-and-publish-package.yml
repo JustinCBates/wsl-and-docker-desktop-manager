@@ -24,6 +24,9 @@ jobs:
 
       - name: Check requirements.in matches pinned requirements.txt
         run: |
+          # Generate requirements.in from pyproject.toml then check pinned file
+          python scripts/sync_reqs_from_pyproject.py
+          python -m pip install --upgrade pip pip-tools
           python -m piptools compile --output-file=requirements.txt --check requirements.in
 
   lint:

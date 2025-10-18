@@ -26,3 +26,8 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+exclude = ["src/.venv", "src/__pycache__", "src/.venv/**"]
