@@ -8,6 +8,17 @@ Quick single-command helpers
 ./scripts/update-requirements.ps1
 ```
 
+Windows notes
+
+If you're on Windows and using PowerShell, the `scripts/update-requirements.ps1` helper will run the sync script and pip-compile for you. If you get execution policy errors, run PowerShell as Administrator and enable script execution for the current session:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+./scripts/update-requirements.ps1
+```
+
+You can also run the sync script and pip-compile manually if you prefer.
+
 - Makefile (Unix-like):
 
 ```sh
