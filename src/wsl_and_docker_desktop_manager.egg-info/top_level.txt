@@ -1,0 +1,5 @@
+backup
+install
+status
+uninstall
+wsl_and_docker_desktop_manager

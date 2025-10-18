@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wsl-and-docker-desktop-manager"
+version = "0.1.0"
+description = "Tools to help manage WSL and Docker Desktop on Windows (packaged subset)."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [ { name = "Justin Bates" } ]
+license = { file = "LICENSE" }
+dependencies = [
+	"questionary>=2.1.1"
+]
+
+[project.optional-dependencies]
+dev = [
+	"ruff",
+	"pylint==4.0.1",
+	"yamllint==1.37.1",
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
