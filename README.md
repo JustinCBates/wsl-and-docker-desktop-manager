@@ -11,10 +11,13 @@ python -m pip install --upgrade pip
 python -m pip install wsl-and-docker-desktop-manager
 ```
 
-Importing in code:
+Importing in code (during development):
 
 ```python
-import wsl_and_docker_desktop_manager
+# When running from the repository root, import the package modules directly:
+from src.install import install_orchestrator
+from src.uninstall import uninstall_orchestrator
+from src.status import get_system_status
 ```
 
 Install from a GitHub Release (token-free)
@@ -23,16 +26,16 @@ Install from a GitHub Release (token-free)
 If you publish wheels as GitHub Release assets, consumers can install the wheel directly from the release URL. This is token-free and suitable for public repositories:
 
 ```powershell
-python -m pip install https://github.com/JustinCBates/wsl-and-docker-desktop-manager/releases/download/v0.1.0/wsl_and_docker_desktop_manager-0.1.0-py3-none-any.whl
+# Releases produce wheels under `dist/` (example):
+# python -m pip install dist\wsl_and_docker_desktop_manager-0.1.0-py3-none-any.whl
 ```
 
 PEP 508 example (declare a release URL in pyproject dependencies):
 
 ```toml
 [project]
-dependencies = [
-	"wsl-and-docker-desktop-manager @ https://github.com/JustinCBates/wsl-and-docker-desktop-manager/releases/download/v0.1.0/wsl_and_docker_desktop_manager-0.1.0-py3-none-any.whl"
-]
+# If you publish a wheel, consumers can reference it by direct URL or host it on PyPI.
+dependencies = []
 ```
 
 Developer install (from git)

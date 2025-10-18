@@ -1,4 +1,4 @@
 def test_import_package():
-    import importlib
-    mod = importlib.import_module("wsl_and_docker_desktop_manager")
-    assert mod is not None
+    # Import a canonical module to ensure src/ modules are importable
+    from src.install import install_orchestrator
+    assert hasattr(install_orchestrator, 'main')
