@@ -16,6 +16,7 @@ import sys
 import tempfile
 import shlex
 import subprocess
+from step_result import StepResult
 
 
 def build_ps_command(script_path, script_args, out_file, err_file):
@@ -63,8 +64,9 @@ def build_ps_command(script_path, script_args, out_file, err_file):
 def run_elevated(script_path, script_args):
     script_path = os.path.abspath(script_path)
     if not os.path.exists(script_path):
-        print(f"Script not found: {script_path}")
-        return 2
+        msg = f"Script not found: {script_path}"
+        print(msg)
+        return StepResult.now(name="run_elevated", status="Failed", message=msg)
 
     out_fd, out_path = tempfile.mkstemp(prefix='elev_out_', suffix='.log')
     err_fd, err_path = tempfile.mkstemp(prefix='elev_err_', suffix='.log')
@@ -106,16 +108,28 @@ def run_elevated(script_path, script_args):
     except Exception:
         pass
 
-    return exit_code
+    # Return a StepResult with exit code info
+    if exit_code == 0:
+        return StepResult.now(name="run_elevated", status="Success", message=f"elevated exit {exit_code}")
+    return StepResult.now(name="run_elevated", status="Failed", message=f"elevated exit {exit_code}")
 
 
 def main(argv):
     if not argv:
         print('Usage: run_elevated.py <script.ps1> [args...]')
+        # Return a printed usage and a failing StepResult
+        res = StepResult.now(name="run_elevated", status="Failed", message="Usage: run_elevated.py <script.ps1> [args...]")
+        print(res.to_dict())
         return 2
     script = argv[0]
     args = argv[1:]
-    return run_elevated(script, args)
+    res = run_elevated(script, args)
+    # If run_elevated returns a StepResult, print and return a compatible exit code
+    if isinstance(res, StepResult):
+        print(res.to_dict())
+        return 0 if res.status == "Success" else 1
+    # fallback for older behavior
+    return 0 if res == 0 else 1
 
 
 if __name__ == '__main__':
