@@ -24,3 +24,6 @@ dependencies/requirements-dev.in
 # OS files
 .DS_Store
 Thumbs.db
+
+test.txt
+# temporary test files\ntests/test.txt
