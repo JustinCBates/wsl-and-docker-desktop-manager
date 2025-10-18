@@ -1,0 +1,64 @@
+name: Block new root directories
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  block-root-additions:
+    name: Prevent new top-level directories
+    runs-on: ubuntu-latest
+    if: >-
+      startsWith(github.ref, 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for new top-level directories
+        env:
+          # allowlist of existing root folders that may receive new files
+          ALLOWED_TOP_LEVEL: "src docs tools tests .github .vscode"
+        run: |
+          set -euo pipefail
+          echo "Allowed top-level dirs: $ALLOWED_TOP_LEVEL"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE=${{ github.event.pull_request.base.sha }}
+            HEAD=${{ github.event.pull_request.head.sha }}
+          else
+            BASE=${{ github.event.before }}
+            HEAD=${{ github.sha }}
+          fi
+          echo "Checking diff range: $BASE..$HEAD"
+
+          # directories present in base commit
+          BASE_DIRS=$(git ls-tree -d --name-only $BASE || true)
+
+          # list added files between base and head
+          ADDED_FILES=$(git diff --name-status $BASE $HEAD | awk '$1 == "A" {print $2}') || true
+
+          BAD_TOPS=""
+          for f in $ADDED_FILES; do
+            # only consider files inside directories (i.e., contain a slash)
+            case "$f" in
+              */*)
+                top=${f%%/*}
+                # if top dir didn't exist in base and isn't allowed, mark bad
+                if ! echo "$BASE_DIRS" | grep -xq "$top"; then
+                  if ! echo "$ALLOWED_TOP_LEVEL" | tr ' ' '\n' | grep -xq "$top"; then
+                    BAD_TOPS="$BAD_TOPS $top"
+                  fi
+                fi
+                ;;
+            esac
+          done
+
+          if [ -n "$BAD_TOPS" ]; then
+            echo "Detected new top-level directories that are not allowed:$BAD_TOPS"
+            echo "Allowed top-level directories: $ALLOWED_TOP_LEVEL"
+            exit 1
+          fi
