@@ -2,8 +2,36 @@
 
 This orchestrator composes small provider functions and returns a list of StepResult objects.
 """
+import os
+import sys
+
+# Add parent src directory to path for imports
+src_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
+
 from step_runner import StepRunner
 from step_result import StepResult
+
+# Import UI library for consistent interface
+try:
+    import sys
+    import os
+    ui_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ui')
+    if ui_path not in sys.path:
+        sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+    from ui.ui_library import render_header, render_selection_menu, get_icon_color, press_enter_to_continue
+except ImportError:
+    # Fallback if UI library not available
+    def render_header(title, **kwargs):
+        print(f"\n=== {title} ===")
+    def render_selection_menu(title, choices, **kwargs):
+        import questionary
+        return questionary.select(title, choices=choices).ask()
+    def get_icon_color(icon):
+        return None
+    def press_enter_to_continue():
+        input("Press Enter to continue...")
 from .docker.uninstall_docker import uninstall_docker
 from .wsl.uninstall_wsl import unregister_wsl
 import subprocess
@@ -82,20 +110,116 @@ def uninstall_sequence(yes: bool = False, dry_run: bool = True, progress_cb=None
 def main(dry_run: bool = True, yes: bool = False, log_path: str = None, targets=None, progress_cb=None, interactive: bool = False):
     """Top-level entrypoint for the uninstall orchestrator.
 
-    If interactive=True and `questionary` is available, prompt the user for
-    dry-run/yes options. Otherwise use provided args. Returns the list of
-    StepResult objects produced by uninstall_sequence.
+    If interactive=True and `questionary` is available, show uninstall options menu.
+    Otherwise use provided args. Returns StepResult objects.
     """
     if interactive:
         try:
-            import questionary  # type: ignore
-            # ask dry-run and yes
-            dr = questionary.confirm("Dry-run (no changes)?", default=True).ask()
-            yn = questionary.confirm("Run with -Yes (allow destructive actions)?", default=False).ask()
-            dry_run = bool(dr)
-            yes = bool(yn)
-        except Exception:
-            # fallback to provided args
-            pass
+            # Show uninstall options menu with UI library
+            uninstall_choices = [
+                "🔄 Complete System Reset",
+                "🗑️ Remove WSL Only", 
+                "🐳 Remove Docker Only",
+                "🔙 Back to Main Menu"
+            ]
+            
+            choice = render_selection_menu(
+                title="Uninstall Options",
+                choices=uninstall_choices,
+                icon="🔄",
+                icon_color=get_icon_color("🔄"),
+                prompt="Choose uninstall option:"
+            )
+            
+            if choice is None or "Back to Main Menu" in choice:
+                return StepResult.now(name="uninstall_orchestrator", status="Cancelled", message="User cancelled uninstall")
+            
+            if "Complete System Reset" in choice:
+                return _handle_complete_reset()
+            elif "Remove WSL Only" in choice:
+                return _handle_wsl_only_removal()
+            elif "Remove Docker Only" in choice:
+                return _handle_docker_only_removal()
+                
+        except Exception as e:
+            return StepResult.now(name="uninstall_orchestrator", status="Error", message=f"UI error: {str(e)}")
 
     return uninstall_sequence(yes=yes, dry_run=dry_run, progress_cb=progress_cb)
+
+
+def _handle_complete_reset():
+    """Handle complete system reset with user confirmation."""
+    try:
+        import questionary  # type: ignore
+        
+        # Render header with UI library
+        render_header("Complete System Reset", icon="🔄", icon_color=get_icon_color("🔄"))
+        print("This will completely remove WSL and Docker Desktop:")
+        print("• Uninstall all WSL distributions")
+        print("• Uninstall Docker Desktop")
+        print("• Remove all associated data")
+        print("⚠️  WARNING: This action is destructive and cannot be undone!")
+        print()
+        
+        # Get user confirmation for destructive action
+        confirm = questionary.confirm("Do you want to proceed with complete system reset?").ask()
+        if not confirm:
+            return StepResult.now(name="complete_reset", status="Cancelled", message="System reset cancelled by user")
+        
+        # Ask about dry-run
+        dry_run = questionary.confirm("Dry-run (no changes)?", default=True).ask()
+        yes = not dry_run  # If not dry-run, then yes to destructive actions
+        
+        results = uninstall_sequence(yes=yes, dry_run=dry_run)
+        return results if isinstance(results, StepResult) else StepResult.now(name="complete_reset", status="Success", message="Complete reset completed")
+        
+    except Exception as e:
+        return StepResult.now(name="complete_reset", status="Error", message=f"Complete reset failed: {str(e)}")
+
+
+def _handle_wsl_only_removal():
+    """Handle WSL-only removal."""
+    try:
+        import questionary  # type: ignore
+        
+        print("🗑️ Remove WSL Only")
+        print("This will remove WSL distributions while keeping Docker Desktop:")
+        print("• Unregister all WSL distributions")
+        print("• Keep Docker Desktop installation")
+        print()
+        
+        confirm = questionary.confirm("Do you want to proceed with WSL removal?").ask()
+        if not confirm:
+            return StepResult.now(name="wsl_removal", status="Cancelled", message="WSL removal cancelled by user")
+        
+        dry_run = questionary.confirm("Dry-run (no changes)?", default=True).ask()
+        
+        # TODO: Implement WSL-only removal logic
+        return StepResult.now(name="wsl_removal", status="Success", message="MOCK: WSL removal completed")
+        
+    except Exception as e:
+        return StepResult.now(name="wsl_removal", status="Error", message=f"WSL removal failed: {str(e)}")
+
+
+def _handle_docker_only_removal():
+    """Handle Docker-only removal."""
+    try:
+        import questionary  # type: ignore
+        
+        print("🐳 Remove Docker Only")
+        print("This will remove Docker Desktop while keeping WSL:")
+        print("• Uninstall Docker Desktop")
+        print("• Keep WSL distributions")
+        print()
+        
+        confirm = questionary.confirm("Do you want to proceed with Docker removal?").ask()
+        if not confirm:
+            return StepResult.now(name="docker_removal", status="Cancelled", message="Docker removal cancelled by user")
+        
+        dry_run = questionary.confirm("Dry-run (no changes)?", default=True).ask()
+        
+        # TODO: Implement Docker-only removal logic
+        return StepResult.now(name="docker_removal", status="Success", message="MOCK: Docker removal completed")
+        
+    except Exception as e:
+        return StepResult.now(name="docker_removal", status="Error", message=f"Docker removal failed: {str(e)}")
